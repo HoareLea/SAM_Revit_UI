@@ -25,7 +25,7 @@ namespace SAM.Core.Revit.UI
             string directory = GetAssemblyDirectory();
             if(!string.IsNullOrWhiteSpace(directory) && System.IO.Directory.Exists(directory))
             {
-                string[] paths = System.IO.Directory.GetFiles(directory, "*.Revit.Addin.dll");
+                string[] paths = System.IO.Directory.GetFiles(directory, "*.Revit.UI.dll");
                 if(paths != null)
                 {
                     foreach(string path in paths)
