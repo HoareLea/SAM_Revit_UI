@@ -164,7 +164,7 @@ namespace SAM.Analytical.Revit.UI
                     TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
 
                     simpleProgressForm.Increment("Updating WeatherData");
-                    Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData);
+                    Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData, analyticalModel == null ? 0 : analyticalModel.AdjacencyCluster.BuildingHeight());
 
                     TBD.Calendar calendar = tBDDocument.Building.GetCalendar();
 
