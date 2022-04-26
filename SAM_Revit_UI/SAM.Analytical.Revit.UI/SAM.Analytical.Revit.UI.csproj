@@ -323,4 +323,35 @@
     <None Include="Resources\SAM_CopyWall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+if "$(ConfigurationName)" == "Debug2020" (
+set Version=Revit 2020
+)
+
+if "$(ConfigurationName)" == "Debug2021" (
+set Version=Revit 2021
+)
+
+if "$(ConfigurationName)" == "Debug2022" (
+set Version=Revit 2022
+)
+
+if "$(ConfigurationName)" == "Release2020" (
+set Version=Revit 2020
+)
+
+if "$(ConfigurationName)" == "Release2021" (
+set Version=Revit 2021
+)
+
+if "$(ConfigurationName)" == "Release2022" (
+set Version=Revit 2022
+)
+
+set SAM_DIR=$(APPDATA)\SAM\%25Version%25
+if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
+
+copy "$(TargetDir)*.dll" "%25SAM_DIR%25"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
