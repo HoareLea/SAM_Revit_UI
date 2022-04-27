@@ -236,10 +236,13 @@ namespace SAM.Analytical.Revit.UI
                     simpleProgressForm.Increment("Initialization");
 
                     ConvertSettings convertSettings = new ConvertSettings(false, true, false);
+                    convertSettings.AddParameter("AdjacencyCluster", adjacencyCluster);
+                    convertSettings.AddParameter("AnalyticalModel", analyticalModel);
 
                     using (Transaction transaction = new Transaction(document, "Simulate"))
                     {
                         transaction.Start();
+
                         foreach (Space space in results.FindAll(x => x is Space))
                         {
                             simpleProgressForm.Increment(string.IsNullOrWhiteSpace(space?.Name) ? "???" : space.Name);
@@ -248,7 +251,22 @@ namespace SAM.Analytical.Revit.UI
 
                             if(elementId != null && elementId != ElementId.InvalidElementId)
                             {
-                                Core.Revit.Modify.SetValues(document.GetElement(elementId), space, ActiveSetting.Setting);
+                                if (space.TryGetValue(SpaceParameter.Occupancy, out double occupancy) && occupancy == 0)
+                                {
+                                    space.RemoveValue(SpaceParameter.Occupancy);
+                                }
+
+                                if(space.InternalCondition != null)
+                                {
+                                    InternalCondition internalCondition = space.InternalCondition;
+                                    if (internalCondition.TryGetValue(InternalConditionParameter.AreaPerPerson, out double areaPerPerson) && areaPerPerson == 0)
+                                    {
+                                        internalCondition.RemoveValue(InternalConditionParameter.AreaPerPerson);
+                                        space.InternalCondition = internalCondition;
+                                    }
+                                }
+
+                                Core.Revit.Modify.SetValues(document.GetElement(elementId), space, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
                             }
                         }
 
@@ -276,7 +294,7 @@ namespace SAM.Analytical.Revit.UI
 
                                 if (dictionary.TryGetValue(panel.Guid, out elementId))
                                 {
-                                    Core.Revit.Modify.SetValues(document.GetElement(elementId), panel, ActiveSetting.Setting);
+                                    Core.Revit.Modify.SetValues(document.GetElement(elementId), panel, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
                                 }
 
                                 List<Aperture> apertures = panel.Apertures;
