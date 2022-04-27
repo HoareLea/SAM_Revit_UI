@@ -225,6 +225,7 @@ namespace SAM.Analytical.Revit.UI
                     adjacencyCluster.GetObjects<ZoneSimulationResult>()?.ForEach(x => results.Add(x));
                     adjacencyCluster.GetObjects<AdjacencyClusterSimulationResult>()?.ForEach(x => results.Add(x));
                     adjacencyCluster.GetPanels()?.ForEach(x => results.Add(x));
+                    adjacencyCluster.GetSpaces()?.ForEach(x => results.Add(x));
                 }
             }
 
@@ -239,8 +240,19 @@ namespace SAM.Analytical.Revit.UI
                     using (Transaction transaction = new Transaction(document, "Simulate"))
                     {
                         transaction.Start();
+                        foreach (Space space in results.FindAll(x => x is Space))
+                        {
+                            simpleProgressForm.Increment(string.IsNullOrWhiteSpace(space?.Name) ? "???" : space.Name);
 
-                        foreach (Core.ISAMObject sAMObject in results)
+                            ElementId elementId = space.ElementId();
+
+                            if(elementId != null && elementId != ElementId.InvalidElementId)
+                            {
+                                Core.Revit.Modify.SetValues(document.GetElement(elementId), space, ActiveSetting.Setting);
+                            }
+                        }
+
+                        foreach (Core.ISAMObject sAMObject in results.FindAll(x => !(x is Space)))
                         {
                             simpleProgressForm.Increment(sAMObject?.Name == null ? "???" : sAMObject.Name);
 
@@ -256,7 +268,7 @@ namespace SAM.Analytical.Revit.UI
                             {
                                 Convert.ToRevit((AdjacencyClusterSimulationResult)sAMObject, document, convertSettings);
                             }
-                            else if(sAMObject is Panel)
+                            else if (sAMObject is Panel)
                             {
                                 Panel panel = (Panel)sAMObject;
 
@@ -268,9 +280,9 @@ namespace SAM.Analytical.Revit.UI
                                 }
 
                                 List<Aperture> apertures = panel.Apertures;
-                                if(apertures != null)
+                                if (apertures != null)
                                 {
-                                    foreach(Aperture aperture in apertures)
+                                    foreach (Aperture aperture in apertures)
                                     {
                                         if (dictionary.TryGetValue(aperture.Guid, out elementId))
                                         {
