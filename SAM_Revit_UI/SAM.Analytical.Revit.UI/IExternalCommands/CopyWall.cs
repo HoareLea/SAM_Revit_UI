@@ -13,7 +13,7 @@ namespace SAM.Analytical.Revit.UI
     {
         public override string RibbonPanelName => "Tools";
 
-        public override int Index => 18;
+        public override int Index => 19;
 
         public override BitmapSource BitmapSource => Core.Windows.Convert.ToBitmapSource(Resources.SAM_CopyWall, 32, 32);
 

@@ -12,7 +12,7 @@ namespace SAM.Analytical.Revit.UI
     {
         public string RibbonPanelName => "Viewers";
 
-        public int Index => 17;
+        public int Index => 18;
 
         public void Create(RibbonPanel ribbonPanel)
         {

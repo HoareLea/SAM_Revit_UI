@@ -155,6 +155,9 @@
     <Reference Include="SAM.Analytical.Tas">
       <HintPath>..\..\..\SAM_Tas\build\SAM.Analytical.Tas.dll</HintPath>
     </Reference>
+    <Reference Include="SAM.Analytical.Windows">
+      <HintPath>..\..\..\SAM_Windows\build\SAM.Analytical.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="SAM.Architectural, Version=1.0.8096.27678, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SAM\build\SAM.Architectural.dll</HintPath>
@@ -211,6 +214,7 @@
     <Compile Include="IExternalCommands\AddWindowAndDoorTags.cs" />
     <Compile Include="IExternalCommands\CreateFloorPlans.cs" />
     <Compile Include="IExternalCommands\CopyWall.cs" />
+    <Compile Include="IExternalCommands\ModifyInternalCondition.cs" />
     <Compile Include="IExternalCommands\OpenViewers.cs" />
     <Compile Include="IExternalCommands\Simulate.cs" />
     <Compile Include="IExternalCommands\OpenTas.cs" />
