@@ -76,7 +76,10 @@ namespace SAM.Analytical.Revit.UI
 
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
-                if(simulateForm.ShowDialog() != DialogResult.OK)
+                Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
+                simulateForm.WeatherData = Core.Convert.ToSAM<WeatherData>(parameter?.AsString())?.FirstOrDefault();
+
+                if (simulateForm.ShowDialog() != DialogResult.OK)
                 {
                     return Result.Cancelled;
                 }
@@ -106,6 +109,10 @@ namespace SAM.Analytical.Revit.UI
                 using (Transaction transaction = new Transaction(document, "Convert Model"))
                 {
                     transaction.Start();
+
+                    Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
+                    parameter?.Set(Core.Convert.ToString(weatherData));
+
                     analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
                     List<Panel> panels = analyticalModel?.GetPanels();
                     if (panels != null)

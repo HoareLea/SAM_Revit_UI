@@ -90,6 +90,12 @@ namespace SAM.Analytical.Revit.UI.Forms
             {
                 return weatherData;
             }
+
+            set
+            {
+                weatherData = value;
+                TextBox_WeatherData.Text = string.IsNullOrWhiteSpace(weatherData?.Name) ? "???" : weatherData.Name;
+            }
         }
 
         public bool UnmetHours
@@ -134,7 +140,7 @@ namespace SAM.Analytical.Revit.UI.Forms
 
             weatherData = weatherData_Temp;
 
-            TextBox_WeatherData.Text = string.IsNullOrWhiteSpace(weatherData.Name) ? "???" : weatherData.Name;
+            TextBox_WeatherData.Text = string.IsNullOrWhiteSpace(weatherData?.Name) ? "???" : weatherData.Name;
         }
     }
 }
