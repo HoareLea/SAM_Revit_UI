@@ -110,9 +110,6 @@ namespace SAM.Analytical.Revit.UI
                 {
                     transaction.Start();
 
-                    Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
-                    parameter?.Set(Core.Convert.ToString(weatherData));
-
                     analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
                     List<Panel> panels = analyticalModel?.GetPanels();
                     if (panels != null)
@@ -249,6 +246,9 @@ namespace SAM.Analytical.Revit.UI
                     using (Transaction transaction = new Transaction(document, "Simulate"))
                     {
                         transaction.Start();
+
+                        Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
+                        parameter?.Set(Core.Convert.ToString(weatherData));
 
                         foreach (Space space in results.FindAll(x => x is Space))
                         {
