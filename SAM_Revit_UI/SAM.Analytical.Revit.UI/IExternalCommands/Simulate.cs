@@ -107,13 +107,14 @@ namespace SAM.Analytical.Revit.UI
 
             bool simulate = false;
 
-            Dictionary<Guid, ElementId> dictionary = new Dictionary<Guid, ElementId>();
+            Dictionary<Guid, ElementId> dictionary = null;
             using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
             {
                 simpleProgressForm.Increment("Converting Model");
                 switch(geometryCalculationMethod)
                 {
                     case GeometryCalculationMethod.gbXML:
+                        dictionary = new Dictionary<Guid, ElementId>();
                         using (Transaction transaction = new Transaction(document, "Convert Model"))
                         {
                             transaction.Start();
@@ -336,8 +337,19 @@ namespace SAM.Analytical.Revit.UI
                                 Panel panel = (Panel)sAMObject;
 
                                 ElementId elementId = null;
+                                if(dictionary != null)
+                                {
+                                    if (!dictionary.TryGetValue(panel.Guid, out elementId))
+                                    {
+                                        elementId = null;
+                                    }
+                                }
+                                else
+                                {
+                                    elementId = panel.ElementId();
+                                }
 
-                                if (dictionary.TryGetValue(panel.Guid, out elementId))
+                                if (elementId != null)
                                 {
                                     Core.Revit.Modify.SetValues(document.GetElement(elementId), panel, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
                                 }
@@ -347,7 +359,20 @@ namespace SAM.Analytical.Revit.UI
                                 {
                                     foreach (Aperture aperture in apertures)
                                     {
-                                        if (dictionary.TryGetValue(aperture.Guid, out elementId))
+                                        elementId = null;
+                                        if (dictionary != null)
+                                        {
+                                            if (!dictionary.TryGetValue(aperture.Guid, out elementId))
+                                            {
+                                                elementId = null;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            elementId = aperture.ElementId();
+                                        }
+
+                                        if (elementId != null)
                                         {
                                             Core.Revit.Modify.SetValues(document.GetElement(elementId), aperture, ActiveSetting.Setting);
                                         }
