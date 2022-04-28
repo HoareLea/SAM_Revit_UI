@@ -28,7 +28,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             ComboBoxControl_SolarCalculationMethod.AddRange(Enum.GetValues(typeof(SolarCalculationMethod)).Cast<Enum>(), (Enum x) => Core.Query.Description(x));
             ComboBoxControl_SolarCalculationMethod.SetSelectedItem(SolarCalculationMethod.SAM);
 
-            ComboBoxControl_GeometryCalculationMethod.AddRange(Enum.GetValues(typeof(GeometryCalculationMethod)).Cast<Enum>(), (Enum x) => Core.Query.Description(x));
+            ComboBoxControl_GeometryCalculationMethod.AddRange(Enum.GetValues(typeof(GeometryCalculationMethod)).Cast<Enum>().ToList().FindAll(x => !x.Equals( GeometryCalculationMethod.Undefined)), (Enum x) => Core.Query.Description(x));
             ComboBoxControl_GeometryCalculationMethod.SetSelectedItem(GeometryCalculationMethod.SAM);
         }
 

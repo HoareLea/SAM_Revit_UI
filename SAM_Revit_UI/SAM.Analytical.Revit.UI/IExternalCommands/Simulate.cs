@@ -94,7 +94,7 @@ namespace SAM.Analytical.Revit.UI
                 geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
             }
 
-            if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.SAM)
+            if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.Undefined)
             {
                 return Result.Failed;
             }
