@@ -75,6 +75,7 @@ namespace SAM.Analytical.Revit.UI
             WeatherData weatherData = null;
             SolarCalculationMethod solarCalculationMethod = SolarCalculationMethod.None;
             GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.SAM;
+            bool updateConstructionLayersByPanelType = false;
 
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
@@ -92,6 +93,7 @@ namespace SAM.Analytical.Revit.UI
                 weatherData = simulateForm.WeatherData;
                 solarCalculationMethod = simulateForm.SolarCalculationMethod;
                 geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
+                updateConstructionLayersByPanelType = simulateForm.UpdateConstructionLayersByPanelType;
             }
 
             if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.Undefined)
@@ -181,6 +183,8 @@ namespace SAM.Analytical.Revit.UI
                     MessageBox.Show("Could not convert to AnalyticalModel");
                     return Result.Failed;
                 }
+
+                analyticalModel = updateConstructionLayersByPanelType ? analyticalModel.UpdateConstructionLayersByPanelType() : analyticalModel;
 
                 if (System.IO.File.Exists(path_TBD))
                 {

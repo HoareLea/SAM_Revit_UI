@@ -118,6 +118,14 @@ namespace SAM.Analytical.Revit.UI.Forms
             }
         }
 
+        public bool UpdateConstructionLayersByPanelType
+        {
+            get
+            {
+                return CheckBox_UpdateConstructionLayersByPanelType.Checked;
+            }
+        }
+
         private void Button_OutputDirectory_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())

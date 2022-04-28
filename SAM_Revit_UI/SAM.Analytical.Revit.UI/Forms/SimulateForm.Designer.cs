@@ -42,12 +42,13 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Label_ProjectName = new System.Windows.Forms.Label();
             this.ComboBoxControl_SolarCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
             this.ComboBoxControl_GeometryCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
+            this.CheckBox_UpdateConstructionLayersByPanelType = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // Button_Cancel
             // 
             this.Button_Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_Cancel.Location = new System.Drawing.Point(413, 346);
+            this.Button_Cancel.Location = new System.Drawing.Point(413, 432);
             this.Button_Cancel.Name = "Button_Cancel";
             this.Button_Cancel.Size = new System.Drawing.Size(75, 28);
             this.Button_Cancel.TabIndex = 0;
@@ -58,7 +59,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // Button_OK
             // 
             this.Button_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_OK.Location = new System.Drawing.Point(332, 346);
+            this.Button_OK.Location = new System.Drawing.Point(332, 432);
             this.Button_OK.Name = "Button_OK";
             this.Button_OK.Size = new System.Drawing.Size(75, 28);
             this.Button_OK.TabIndex = 1;
@@ -128,7 +129,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // CheckBox_UnmetHours
             // 
             this.CheckBox_UnmetHours.AutoSize = true;
-            this.CheckBox_UnmetHours.Location = new System.Drawing.Point(293, 228);
+            this.CheckBox_UnmetHours.Location = new System.Drawing.Point(15, 339);
             this.CheckBox_UnmetHours.Name = "CheckBox_UnmetHours";
             this.CheckBox_UnmetHours.Size = new System.Drawing.Size(113, 21);
             this.CheckBox_UnmetHours.TabIndex = 11;
@@ -173,12 +174,23 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_GeometryCalculationMethod.Size = new System.Drawing.Size(203, 55);
             this.ComboBoxControl_GeometryCalculationMethod.TabIndex = 0;
             // 
+            // CheckBox_UpdateConstructionLayersByPanelType
+            // 
+            this.CheckBox_UpdateConstructionLayersByPanelType.AutoSize = true;
+            this.CheckBox_UpdateConstructionLayersByPanelType.Location = new System.Drawing.Point(15, 381);
+            this.CheckBox_UpdateConstructionLayersByPanelType.Name = "CheckBox_UpdateConstructionLayersByPanelType";
+            this.CheckBox_UpdateConstructionLayersByPanelType.Size = new System.Drawing.Size(353, 21);
+            this.CheckBox_UpdateConstructionLayersByPanelType.TabIndex = 11;
+            this.CheckBox_UpdateConstructionLayersByPanelType.Text = "Update Missing Construction Layers By Panel Type";
+            this.CheckBox_UpdateConstructionLayersByPanelType.UseVisualStyleBackColor = true;
+            // 
             // SimulateForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(500, 386);
+            this.ClientSize = new System.Drawing.Size(500, 472);
             this.Controls.Add(this.TextBox_ProjectName);
             this.Controls.Add(this.Label_ProjectName);
+            this.Controls.Add(this.CheckBox_UpdateConstructionLayersByPanelType);
             this.Controls.Add(this.CheckBox_UnmetHours);
             this.Controls.Add(this.Button_WeatherData);
             this.Controls.Add(this.TextBox_WeatherData);
@@ -217,5 +229,6 @@ namespace SAM.Analytical.Revit.UI.Forms
         private System.Windows.Forms.Label Label_ProjectName;
         private SAM.Core.Windows.ComboBoxControl ComboBoxControl_SolarCalculationMethod;
         private Core.Windows.ComboBoxControl ComboBoxControl_GeometryCalculationMethod;
+        private System.Windows.Forms.CheckBox CheckBox_UpdateConstructionLayersByPanelType;
     }
 }
