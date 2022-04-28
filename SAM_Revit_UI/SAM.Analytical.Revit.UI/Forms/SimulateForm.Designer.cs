@@ -37,17 +37,17 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Button_WeatherData = new System.Windows.Forms.Button();
             this.TextBox_WeatherData = new System.Windows.Forms.TextBox();
             this.Label_WeatherData = new System.Windows.Forms.Label();
-            this.ComboBox_SolarCalculationMethod = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.CheckBox_UnmetHours = new System.Windows.Forms.CheckBox();
             this.TextBox_ProjectName = new System.Windows.Forms.TextBox();
             this.Label_ProjectName = new System.Windows.Forms.Label();
+            this.ComboBoxControl_SolarCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
+            this.ComboBoxControl_GeometryCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
             this.SuspendLayout();
             // 
             // Button_Cancel
             // 
             this.Button_Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_Cancel.Location = new System.Drawing.Point(495, 313);
+            this.Button_Cancel.Location = new System.Drawing.Point(413, 346);
             this.Button_Cancel.Name = "Button_Cancel";
             this.Button_Cancel.Size = new System.Drawing.Size(75, 28);
             this.Button_Cancel.TabIndex = 0;
@@ -58,7 +58,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // Button_OK
             // 
             this.Button_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_OK.Location = new System.Drawing.Point(414, 313);
+            this.Button_OK.Location = new System.Drawing.Point(332, 346);
             this.Button_OK.Name = "Button_OK";
             this.Button_OK.Size = new System.Drawing.Size(75, 28);
             this.Button_OK.TabIndex = 1;
@@ -81,13 +81,13 @@ namespace SAM.Analytical.Revit.UI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TextBox_OutputDirectory.Location = new System.Drawing.Point(12, 96);
             this.TextBox_OutputDirectory.Name = "TextBox_OutputDirectory";
-            this.TextBox_OutputDirectory.Size = new System.Drawing.Size(512, 22);
+            this.TextBox_OutputDirectory.Size = new System.Drawing.Size(430, 22);
             this.TextBox_OutputDirectory.TabIndex = 3;
             // 
             // Button_OutputDirectory
             // 
             this.Button_OutputDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_OutputDirectory.Location = new System.Drawing.Point(530, 96);
+            this.Button_OutputDirectory.Location = new System.Drawing.Point(448, 96);
             this.Button_OutputDirectory.Name = "Button_OutputDirectory";
             this.Button_OutputDirectory.Size = new System.Drawing.Size(40, 23);
             this.Button_OutputDirectory.TabIndex = 4;
@@ -98,7 +98,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // Button_WeatherData
             // 
             this.Button_WeatherData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_WeatherData.Location = new System.Drawing.Point(530, 161);
+            this.Button_WeatherData.Location = new System.Drawing.Point(448, 161);
             this.Button_WeatherData.Name = "Button_WeatherData";
             this.Button_WeatherData.Size = new System.Drawing.Size(40, 23);
             this.Button_WeatherData.TabIndex = 7;
@@ -113,7 +113,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.TextBox_WeatherData.Location = new System.Drawing.Point(12, 161);
             this.TextBox_WeatherData.Name = "TextBox_WeatherData";
             this.TextBox_WeatherData.ReadOnly = true;
-            this.TextBox_WeatherData.Size = new System.Drawing.Size(512, 22);
+            this.TextBox_WeatherData.Size = new System.Drawing.Size(430, 22);
             this.TextBox_WeatherData.TabIndex = 6;
             // 
             // Label_WeatherData
@@ -124,24 +124,6 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Label_WeatherData.Size = new System.Drawing.Size(100, 17);
             this.Label_WeatherData.TabIndex = 5;
             this.Label_WeatherData.Text = "Weather Data:";
-            // 
-            // ComboBox_SolarCalculationMethod
-            // 
-            this.ComboBox_SolarCalculationMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ComboBox_SolarCalculationMethod.FormattingEnabled = true;
-            this.ComboBox_SolarCalculationMethod.Location = new System.Drawing.Point(12, 226);
-            this.ComboBox_SolarCalculationMethod.Name = "ComboBox_SolarCalculationMethod";
-            this.ComboBox_SolarCalculationMethod.Size = new System.Drawing.Size(214, 24);
-            this.ComboBox_SolarCalculationMethod.TabIndex = 9;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 203);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(169, 17);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Solar Calculation Method:";
             // 
             // CheckBox_UnmetHours
             // 
@@ -159,7 +141,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TextBox_ProjectName.Location = new System.Drawing.Point(12, 31);
             this.TextBox_ProjectName.Name = "TextBox_ProjectName";
-            this.TextBox_ProjectName.Size = new System.Drawing.Size(512, 22);
+            this.TextBox_ProjectName.Size = new System.Drawing.Size(430, 22);
             this.TextBox_ProjectName.TabIndex = 13;
             // 
             // Label_ProjectName
@@ -171,15 +153,33 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Label_ProjectName.TabIndex = 12;
             this.Label_ProjectName.Text = "Project Name:";
             // 
+            // ComboBoxControl_SolarCalculationMethod
+            // 
+            this.ComboBoxControl_SolarCalculationMethod.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ComboBoxControl_SolarCalculationMethod.Description = "Solar Calculation Method:";
+            this.ComboBoxControl_SolarCalculationMethod.Location = new System.Drawing.Point(12, 203);
+            this.ComboBoxControl_SolarCalculationMethod.Name = "ComboBoxControl_SolarCalculationMethod";
+            this.ComboBoxControl_SolarCalculationMethod.Size = new System.Drawing.Size(203, 55);
+            this.ComboBoxControl_SolarCalculationMethod.TabIndex = 0;
+            // 
+            // ComboBoxControl_GeometryCalculationMethod
+            // 
+            this.ComboBoxControl_GeometryCalculationMethod.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ComboBoxControl_GeometryCalculationMethod.Description = "Geometry Calculation Method:";
+            this.ComboBoxControl_GeometryCalculationMethod.Location = new System.Drawing.Point(12, 264);
+            this.ComboBoxControl_GeometryCalculationMethod.Name = "ComboBoxControl_GeometryCalculationMethod";
+            this.ComboBoxControl_GeometryCalculationMethod.Size = new System.Drawing.Size(203, 55);
+            this.ComboBoxControl_GeometryCalculationMethod.TabIndex = 0;
+            // 
             // SimulateForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(582, 353);
+            this.ClientSize = new System.Drawing.Size(500, 386);
             this.Controls.Add(this.TextBox_ProjectName);
             this.Controls.Add(this.Label_ProjectName);
             this.Controls.Add(this.CheckBox_UnmetHours);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.ComboBox_SolarCalculationMethod);
             this.Controls.Add(this.Button_WeatherData);
             this.Controls.Add(this.TextBox_WeatherData);
             this.Controls.Add(this.Label_WeatherData);
@@ -188,6 +188,8 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Controls.Add(this.Label_OutputDirectory);
             this.Controls.Add(this.Button_OK);
             this.Controls.Add(this.Button_Cancel);
+            this.Controls.Add(this.ComboBoxControl_GeometryCalculationMethod);
+            this.Controls.Add(this.ComboBoxControl_SolarCalculationMethod);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -210,10 +212,10 @@ namespace SAM.Analytical.Revit.UI.Forms
         private System.Windows.Forms.Button Button_WeatherData;
         private System.Windows.Forms.TextBox TextBox_WeatherData;
         private System.Windows.Forms.Label Label_WeatherData;
-        private System.Windows.Forms.ComboBox ComboBox_SolarCalculationMethod;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox CheckBox_UnmetHours;
         private System.Windows.Forms.TextBox TextBox_ProjectName;
         private System.Windows.Forms.Label Label_ProjectName;
+        private SAM.Core.Windows.ComboBoxControl ComboBoxControl_SolarCalculationMethod;
+        private Core.Windows.ComboBoxControl ComboBoxControl_GeometryCalculationMethod;
     }
 }

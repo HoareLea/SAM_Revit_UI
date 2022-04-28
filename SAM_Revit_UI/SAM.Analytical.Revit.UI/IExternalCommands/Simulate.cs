@@ -6,6 +6,7 @@ using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
 using SAM.Core.Tas;
+using SAM.Geometry.Spatial;
 using SAM.Weather;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,7 @@ namespace SAM.Analytical.Revit.UI
             bool unmetHours = false;
             WeatherData weatherData = null;
             SolarCalculationMethod solarCalculationMethod = SolarCalculationMethod.None;
+            GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.SAM;
 
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
@@ -89,9 +91,10 @@ namespace SAM.Analytical.Revit.UI
                 unmetHours = simulateForm.UnmetHours;
                 weatherData = simulateForm.WeatherData;
                 solarCalculationMethod = simulateForm.SolarCalculationMethod;
+                geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
             }
 
-            if (weatherData == null)
+            if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.SAM)
             {
                 return Result.Failed;
             }
@@ -106,41 +109,72 @@ namespace SAM.Analytical.Revit.UI
             using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
             {
                 simpleProgressForm.Increment("Converting Model");
-                using (Transaction transaction = new Transaction(document, "Convert Model"))
+                switch(geometryCalculationMethod)
                 {
-                    transaction.Start();
-
-                    analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-                    List<Panel> panels = analyticalModel?.GetPanels();
-                    if (panels != null)
-                    {
-                        foreach(Panel panel in panels)
+                    case GeometryCalculationMethod.gbXML:
+                        using (Transaction transaction = new Transaction(document, "Convert Model"))
                         {
-                            EnergyAnalysisSurface energyAnalysisSurface = Core.Revit.Query.Element<EnergyAnalysisSurface>(document, panel);
-                            HostObject hostObject = Core.Revit.Query.Element(document, energyAnalysisSurface?.CADObjectUniqueId, energyAnalysisSurface?.CADLinkUniqueId) as HostObject;
-                            if(hostObject != null)
-                            {
-                                dictionary[panel.Guid] = hostObject.Id;
-                            }
+                            transaction.Start();
 
-                            List<Aperture> apertures = panel.Apertures;
-                            if(apertures != null)
+                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
+                            List<Panel> panels_Temp = analyticalModel?.GetPanels();
+                            if (panels_Temp != null)
                             {
-                                foreach(Aperture aperture in apertures)
+                                foreach (Panel panel in panels_Temp)
                                 {
-                                    EnergyAnalysisOpening energyAnalysisOpening = Core.Revit.Query.Element<EnergyAnalysisOpening>(document, aperture);
-                                    FamilyInstance familyInstance = Core.Revit.Query.Element(energyAnalysisOpening) as FamilyInstance;
-                                    if(familyInstance != null)
+                                    EnergyAnalysisSurface energyAnalysisSurface = Core.Revit.Query.Element<EnergyAnalysisSurface>(document, panel);
+                                    HostObject hostObject = Core.Revit.Query.Element(document, energyAnalysisSurface?.CADObjectUniqueId, energyAnalysisSurface?.CADLinkUniqueId) as HostObject;
+                                    if (hostObject != null)
                                     {
-                                        dictionary[aperture.Guid] = familyInstance.Id;
+                                        dictionary[panel.Guid] = hostObject.Id;
+                                    }
+
+                                    List<Aperture> apertures = panel.Apertures;
+                                    if (apertures != null)
+                                    {
+                                        foreach (Aperture aperture in apertures)
+                                        {
+                                            EnergyAnalysisOpening energyAnalysisOpening = Core.Revit.Query.Element<EnergyAnalysisOpening>(document, aperture);
+                                            FamilyInstance familyInstance = Core.Revit.Query.Element(energyAnalysisOpening) as FamilyInstance;
+                                            if (familyInstance != null)
+                                            {
+                                                dictionary[aperture.Guid] = familyInstance.Id;
+                                            }
+                                        }
                                     }
                                 }
                             }
+
+                            transaction.RollBack();
                         }
-                    }
-                    
-                    transaction.RollBack();
+                        break;
+                    case GeometryCalculationMethod.SAM:
+                        using (Transaction transaction = new Transaction(document, "Convert Model"))
+                        {
+                            transaction.Start();
+
+                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
+
+                            transaction.RollBack();
+                        }
+
+                        ConvertSettings convertSettings = new ConvertSettings(true, true, true);
+                        IEnumerable<Panel> panels = Convert.ToSAM<Panel>(document, convertSettings);
+
+                        List<Shell> shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
+                        if(shells == null || shells.Count == 0)
+                        {
+                            return Result.Failed;
+                        }
+
+                        IEnumerable<Space> spaces = Convert.ToSAM<Space>(document, convertSettings);
+
+                        AdjacencyCluster adjacencyCluster_Temp = Analytical.Create.AdjacencyCluster(shells, spaces, panels, false, true, 0.01, Core.Tolerance.MacroDistance, 0.01, 0.0872664626, Core.Tolerance.MacroDistance, Core.Tolerance.Distance, Core.Tolerance.Angle);
+
+                        analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster_Temp);
+                        break;
                 }
+
 
                 if (analyticalModel == null)
                 {
@@ -331,241 +365,5 @@ namespace SAM.Analytical.Revit.UI
 
             return Result.Succeeded;
         }
-
-        //public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
-        //{
-        //    Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-        //    if (document == null)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    WeatherData weatherData = null;
-        //    using (OpenFileDialog openFileDialog = new OpenFileDialog())
-        //    {
-        //        openFileDialog.Filter = "epw files (*.epw)|*.epw|TAS TBD files (*.tbd)|*.tbd|TAS TSD files (*.tsd)|*.tsd|TAS TWD files (*.twd)|*.twd|All files (*.*)|*.*";
-        //        openFileDialog.FilterIndex = 1;
-        //        openFileDialog.RestoreDirectory = true;
-
-        //        if (openFileDialog.ShowDialog() != DialogResult.OK)
-        //        {
-        //            return Result.Cancelled;
-        //        }
-
-        //        string path_WeatherData = openFileDialog.FileName;
-        //        string extension = System.IO.Path.GetExtension(path_WeatherData).ToLower().Trim();
-        //        if (string.IsNullOrWhiteSpace(extension))
-        //        {
-        //            return Result.Failed;
-        //        }
-
-        //        try
-        //        {
-        //            if (extension.EndsWith("epw"))
-        //            {
-        //                weatherData = Weather.Convert.ToSAM(path_WeatherData);
-        //            }
-        //            else
-        //            {
-        //                List<WeatherData> weatherDatas = Weather.Tas.Convert.ToSAM_WeatherDatas(path_WeatherData);
-        //                if (weatherDatas == null || weatherDatas.Count == 0)
-        //                {
-        //                    return Result.Failed;
-        //                }
-
-        //                if (weatherDatas.Count == 1)
-        //                {
-        //                    weatherData = weatherDatas[0];
-        //                }
-        //                else
-        //                {
-        //                    weatherDatas.Sort((x, y) => x.Name.CompareTo(y.Name));
-
-        //                    using (Core.Windows.Forms.ComboBoxForm<WeatherData> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<WeatherData>("Select Weather Data", weatherDatas, (WeatherData x) => x.Name))
-        //                    {
-        //                        if (comboBoxForm.ShowDialog() != DialogResult.OK)
-        //                        {
-        //                            return Result.Cancelled;
-        //                        }
-
-        //                        weatherData = comboBoxForm.SelectedItem;
-        //                    }
-
-        //                }
-
-        //            }
-        //        }
-        //        catch (Exception exception)
-        //        {
-        //            weatherData = null;
-        //        }
-        //    }
-
-        //    if (weatherData == null)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    string path = document.PathName;
-        //    if (string.IsNullOrWhiteSpace(path))
-        //    {
-        //        string name = document.Title;
-        //        if (string.IsNullOrWhiteSpace(name))
-        //        {
-        //            name = "000000_SAM_AnalyticalModel";
-        //        }
-
-        //        using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-        //        {
-        //            folderBrowserDialog.Description = "Select Directory";
-        //            folderBrowserDialog.ShowNewFolderButton = true;
-        //            if (folderBrowserDialog.ShowDialog() != DialogResult.OK)
-        //            {
-        //                return Result.Cancelled;
-        //            }
-
-        //            path = System.IO.Path.Combine(folderBrowserDialog.SelectedPath, name + ".rvt");
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(path))
-        //        {
-        //            return Result.Failed;
-        //        }
-
-        //        document.SaveAs(path);
-        //    }
-
-        //    AnalyticalModel analyticalModel = null;
-
-        //    using (Transaction transaction = new Transaction(document, "Convert Model"))
-        //    {
-        //        transaction.Start();
-        //        analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-        //        transaction.RollBack();
-        //    }
-
-        //    if (analyticalModel == null)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    string path_gbXML = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path));
-        //    if (System.IO.File.Exists(path_gbXML))
-        //    {
-        //        System.IO.File.Delete(path_gbXML);
-        //    }
-
-        //    bool exported = false;
-
-
-        //    exported = document.TogbXML(path_gbXML);
-        //    if (!exported)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    path_gbXML = path_gbXML + ".xml";
-
-        //    string path_T3D = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path) + ".t3d");
-
-        //    exported = Core.Tas.Convert.ToT3D(path_T3D, path_gbXML, true, true, true, false);
-        //    if (!exported)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    analyticalModel = Tas.Query.UpdateT3D(analyticalModel, path_T3D);
-
-        //    string path_TBD = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path) + ".tbd");
-
-        //    using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
-        //    {
-        //        TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
-
-        //        Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData);
-
-        //        double latitude_TBD = Core.Query.Round(analyticalModel.Location.Latitude, 0.01);
-        //        double longitude_TBD = Core.Query.Round(analyticalModel.Location.Longitude, 0.01);
-
-        //        double latitude_WeatherData = Core.Query.Round(weatherData.Latitude, 0.01);
-        //        double longitude_WeatherDate = Core.Query.Round(weatherData.Longitude, 0.01);
-
-        //        //if (Math.Abs(latitude_TBD - latitude_WeatherData) > 0.01 || Math.Abs(longitude_TBD - longitude_WeatherDate) > 0.01)
-        //        //{
-        //        //    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "WeatherData Longitude or Latitude mismatch");
-        //        //}
-
-        //        TBD.Calendar calendar = tBDDocument.Building.GetCalendar();
-
-        //        TBD.dayType dayType = null;
-
-        //        dayType = calendar.AddDayType();
-        //        dayType.name = "HDD";
-
-        //        dayType = calendar.AddDayType();
-        //        dayType.name = "CDD";
-
-        //        sAMTBDDocument.Save();
-        //    }
-
-        //    exported = Tas.Convert.ToTBD(path_T3D, path_TBD, 1, 365, 15, true);
-        //    if (!exported)
-        //    {
-        //        return Result.Failed;
-        //    }
-
-        //    AdjacencyCluster adjacencyCluster = null;
-
-        //    using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
-        //    {
-        //        Tas.Query.UpdateFacingExternal(analyticalModel, sAMTBDDocument);
-
-        //        Tas.Modify.AssignAdiabaticConstruction(sAMTBDDocument.TBDDocument.Building, "Adiabatic", new string[] { "-unzoned", "-internal", "-exposed" }, false, true);
-
-        //        Tas.Modify.UpdateBuildingElements(sAMTBDDocument, analyticalModel);
-
-        //        adjacencyCluster = analyticalModel.AdjacencyCluster;
-        //        Tas.Modify.UpdateThermalParameters(adjacencyCluster, sAMTBDDocument.TBDDocument?.Building);
-        //        analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster);
-
-        //        Tas.Modify.UpdateZones(analyticalModel, sAMTBDDocument, true);
-
-        //        //Update.DesignDays Missing!!
-
-        //        sAMTBDDocument.Save();
-        //    }
-
-        //    Tas.Query.Sizing(path_TBD, analyticalModel, false, true);
-
-        //    analyticalModel = Tas.Modify.UpdateDesignLoads(path_TBD, analyticalModel);
-
-        //    bool hasWeatherData = false;
-        //    using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
-        //    {
-        //        TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
-
-        //        hasWeatherData = tBDDocument?.Building.GetWeatherYear() != null;
-        //    }
-
-        //    if (!hasWeatherData)
-        //    {
-        //        MessageBox.Show("Could not complete simulation. TBD file has no Weather Data");
-        //        return Result.Failed;
-        //    }
-
-        //    string path_TSD = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path) + ".tsd");
-
-        //    bool result = Tas.Modify.Simulate(path_TBD, path_TSD, 1, 365);
-
-
-
-        //    adjacencyCluster = analyticalModel.AdjacencyCluster;
-        //    Tas.Modify.AddResults(path_TSD, adjacencyCluster);
-        //    analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster);
-
-        //    analyticalModel.ToRevit(document, new ConvertSettings(true, true, false));
-
-        //    return Result.Succeeded;
-        //}
     }
 }

@@ -1,6 +1,8 @@
 ﻿using SAM.Weather;
 using System;
 using System.Windows.Forms;
+using SAM.Core.Windows;
+using System.Linq;
 
 namespace SAM.Analytical.Revit.UI.Forms
 {
@@ -23,17 +25,11 @@ namespace SAM.Analytical.Revit.UI.Forms
 
         private void SimulateForm_Load(object sender, EventArgs e)
         {
-            foreach(SolarCalculationMethod solarCalculationMethod in Enum.GetValues(typeof(SolarCalculationMethod)))
-            {
-                if(solarCalculationMethod == SolarCalculationMethod.Undefined)
-                {
-                    continue;
-                }
+            ComboBoxControl_SolarCalculationMethod.AddRange(Enum.GetValues(typeof(SolarCalculationMethod)).Cast<Enum>(), (Enum x) => Core.Query.Description(x));
+            ComboBoxControl_SolarCalculationMethod.SetSelectedItem(SolarCalculationMethod.SAM);
 
-                ComboBox_SolarCalculationMethod.Items.Add(Core.Query.Description(solarCalculationMethod));
-            }
-
-            ComboBox_SolarCalculationMethod.SelectedItem = Core.Query.Description(SolarCalculationMethod.SAM);
+            ComboBoxControl_GeometryCalculationMethod.AddRange(Enum.GetValues(typeof(GeometryCalculationMethod)).Cast<Enum>(), (Enum x) => Core.Query.Description(x));
+            ComboBoxControl_GeometryCalculationMethod.SetSelectedItem(GeometryCalculationMethod.SAM);
         }
 
         private void Button_OK_Click(object sender, EventArgs e)
@@ -110,7 +106,15 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return Core.Query.Enum<SolarCalculationMethod>(ComboBox_SolarCalculationMethod.SelectedItem?.ToString());
+                return ComboBoxControl_SolarCalculationMethod.GetSelectedItem<SolarCalculationMethod>();
+            }
+        }
+
+        public GeometryCalculationMethod GeometryCalculationMethod
+        {
+            get
+            {
+                return ComboBoxControl_GeometryCalculationMethod.GetSelectedItem<GeometryCalculationMethod>();
             }
         }
 

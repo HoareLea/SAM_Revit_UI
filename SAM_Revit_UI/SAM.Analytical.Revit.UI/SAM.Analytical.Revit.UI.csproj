@@ -203,6 +203,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\GeometryCalculationMethod.cs" />
     <Compile Include="Enums\SolarCalculationMethod.cs" />
     <Compile Include="Forms\SimulateForm.cs">
       <SubType>Form</SubType>
