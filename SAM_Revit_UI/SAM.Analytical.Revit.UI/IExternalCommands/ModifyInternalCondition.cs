@@ -97,7 +97,15 @@ namespace SAM.Analytical.Revit.UI
             using (Transaction transaction = new Transaction(document, "Modify Internal Condition"))
             {
                 transaction.Start();
+                Core.Revit.Modify.SetValues(space_Revit, space);
                 Core.Revit.Modify.SetValues(space_Revit, space, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
+                InternalCondition internalCondition = space.InternalCondition;
+                if (internalCondition != null)
+                {
+                    Core.Revit.Modify.SetValues(space_Revit, internalCondition);
+                    Core.Revit.Modify.SetValues(space_Revit, internalCondition, ActiveSetting.Setting, convertSettings.GetParameters());
+                }
+
                 transaction.Commit();
             }
 
