@@ -116,6 +116,11 @@ namespace SAM.Analytical.Revit.UI
                 simpleProgressForm.Increment("Converting Model");
 
                 List<Panel> panels_Temp = null;
+                AdjacencyCluster adjacencyCluster_Temp = null;
+                IEnumerable<Panel> panels = null;
+                List<Shell> shells = null;
+                IEnumerable<Space> spaces = null;
+                ConvertSettings convertSettings = null;
 
                 switch (geometryCalculationMethod)
                 {
@@ -157,6 +162,7 @@ namespace SAM.Analytical.Revit.UI
                             transaction.RollBack();
                         }
                         break;
+
                     case GeometryCalculationMethod.SAM:
                         using (Transaction transaction = new Transaction(document, "Convert Model"))
                         {
@@ -167,18 +173,18 @@ namespace SAM.Analytical.Revit.UI
                             transaction.RollBack();
                         }
 
-                        ConvertSettings convertSettings = new ConvertSettings(true, true, true);
-                        IEnumerable<Panel> panels = Convert.ToSAM<Panel>(document, convertSettings);
+                        convertSettings = new ConvertSettings(true, true, true);
+                        panels = Convert.ToSAM<Panel>(document, convertSettings);
 
-                        List<Shell> shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
+                        shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
                         if(shells == null || shells.Count == 0)
                         {
                             return Result.Failed;
                         }
 
-                        IEnumerable<Space> spaces = Convert.ToSAM<Space>(document, convertSettings);
+                        spaces = Convert.ToSAM<Space>(document, convertSettings);
 
-                        AdjacencyCluster adjacencyCluster_Temp = Analytical.Create.AdjacencyCluster(shells, spaces, panels, false, true, 0.01, Core.Tolerance.MacroDistance, 0.01, 0.0872664626, Core.Tolerance.MacroDistance, Core.Tolerance.Distance, Core.Tolerance.Angle);
+                        adjacencyCluster_Temp = Analytical.Create.AdjacencyCluster(shells, spaces, panels, false, true, 0.01, Core.Tolerance.MacroDistance, 0.01, 0.0872664626, Core.Tolerance.MacroDistance, Core.Tolerance.Distance, Core.Tolerance.Angle);
                         panels_Temp = adjacencyCluster_Temp.GetPanels();
                         if(panels_Temp != null && panels_Temp.Count != 0)
                         {
@@ -214,6 +220,77 @@ namespace SAM.Analytical.Revit.UI
                                         }
 
                                         if(aperture.TryGetValue(ElementParameter.ElementId, out int @int))
+                                        {
+                                            apertures_Temp[i].SetValue(ElementParameter.ElementId, @int);
+                                            panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
+                                            panel_Temp.AddAperture(apertures_Temp[i]);
+                                        }
+                                    }
+
+                                    adjacencyCluster_Temp.AddObject(panel_Temp);
+                                }
+                            }
+                        }
+
+                        analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster_Temp);
+                        break;
+
+                    case GeometryCalculationMethod.Topologic:
+                        using (Transaction transaction = new Transaction(document, "Convert Model"))
+                        {
+                            transaction.Start();
+
+                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
+
+                            transaction.RollBack();
+                        }
+
+                        convertSettings = new ConvertSettings(true, true, true);
+                        panels = Convert.ToSAM<Panel>(document, convertSettings);
+
+                        shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
+                        if (shells == null || shells.Count == 0)
+                        {
+                            return Result.Failed;
+                        }
+
+                        spaces = Convert.ToSAM<Space>(document, convertSettings);
+                        adjacencyCluster_Temp = Topologic.Create.AdjacencyCluster(spaces, panels, out List<global::Topologic.Topology> topologies, out List<Panel> redundantPanels);
+                        panels_Temp = adjacencyCluster_Temp.GetPanels();
+                        if (panels_Temp != null && panels_Temp.Count != 0)
+                        {
+                            List<Aperture> apertures = new List<Aperture>();
+                            foreach (Panel panel in panels)
+                            {
+                                List<Aperture> apertures_Temp = panel?.Apertures;
+                                if (apertures_Temp != null)
+                                {
+                                    apertures.AddRange(apertures_Temp);
+                                }
+                            }
+
+                            foreach (Panel panel_Temp in panels_Temp)
+                            {
+                                List<Aperture> apertures_Temp = panel_Temp?.Apertures;
+                                if (apertures_Temp != null)
+                                {
+                                    for (int i = 0; i < apertures_Temp.Count; i++)
+                                    {
+                                        Aperture aperture_Temp = apertures_Temp[i];
+
+                                        Point3D point3D = aperture_Temp?.Face3D?.InternalPoint3D(Core.Tolerance.MacroDistance);
+                                        if (point3D == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        Aperture aperture = apertures.InRange(point3D, new Core.Range<double>(0, Core.Tolerance.MacroDistance), true, 1, Core.Tolerance.Distance)?.FirstOrDefault();
+                                        if (aperture == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        if (aperture.TryGetValue(ElementParameter.ElementId, out int @int))
                                         {
                                             apertures_Temp[i].SetValue(ElementParameter.ElementId, @int);
                                             panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
@@ -479,7 +556,7 @@ namespace SAM.Analytical.Revit.UI
                 secondsString = "0" + secondsString;
             }
 
-            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}h{1}m{2}s", hoursString, minutesString, secondsString));
+            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}h {1}m {2}s", hoursString, minutesString, secondsString));
 
             return Result.Succeeded;
         }

@@ -7,6 +7,7 @@ namespace SAM.Analytical.Revit.UI
     {
         [Description("Undefined")] Undefined,
         [Description("SAM")] SAM,
+        [Description("Topologic")] Topologic,
         [Description("gbXML")] gbXML,
     }
 }

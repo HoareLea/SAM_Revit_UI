@@ -177,6 +177,8 @@ namespace SAM.Analytical.Revit.UI.Forms
             // CheckBox_UpdateConstructionLayersByPanelType
             // 
             this.CheckBox_UpdateConstructionLayersByPanelType.AutoSize = true;
+            this.CheckBox_UpdateConstructionLayersByPanelType.Checked = true;
+            this.CheckBox_UpdateConstructionLayersByPanelType.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CheckBox_UpdateConstructionLayersByPanelType.Location = new System.Drawing.Point(15, 381);
             this.CheckBox_UpdateConstructionLayersByPanelType.Name = "CheckBox_UpdateConstructionLayersByPanelType";
             this.CheckBox_UpdateConstructionLayersByPanelType.Size = new System.Drawing.Size(353, 21);
