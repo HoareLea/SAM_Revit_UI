@@ -334,3 +334,6 @@ ASALocalRun/
 
 #Include build only references
 !references_buildonly/**.*
+
+#Include build only references
+!references/**.*
