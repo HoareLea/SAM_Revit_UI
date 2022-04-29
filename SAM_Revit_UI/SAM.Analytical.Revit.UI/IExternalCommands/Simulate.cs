@@ -111,7 +111,10 @@ namespace SAM.Analytical.Revit.UI
             using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
             {
                 simpleProgressForm.Increment("Converting Model");
-                switch(geometryCalculationMethod)
+
+                List<Panel> panels_Temp = null;
+
+                switch (geometryCalculationMethod)
                 {
                     case GeometryCalculationMethod.gbXML:
                         dictionary = new Dictionary<Guid, ElementId>();
@@ -120,7 +123,7 @@ namespace SAM.Analytical.Revit.UI
                             transaction.Start();
 
                             analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-                            List<Panel> panels_Temp = analyticalModel?.GetPanels();
+                            panels_Temp = analyticalModel?.GetPanels();
                             if (panels_Temp != null)
                             {
                                 foreach (Panel panel in panels_Temp)
@@ -173,11 +176,56 @@ namespace SAM.Analytical.Revit.UI
                         IEnumerable<Space> spaces = Convert.ToSAM<Space>(document, convertSettings);
 
                         AdjacencyCluster adjacencyCluster_Temp = Analytical.Create.AdjacencyCluster(shells, spaces, panels, false, true, 0.01, Core.Tolerance.MacroDistance, 0.01, 0.0872664626, Core.Tolerance.MacroDistance, Core.Tolerance.Distance, Core.Tolerance.Angle);
+                        panels_Temp = adjacencyCluster_Temp.GetPanels();
+                        if(panels_Temp != null && panels_Temp.Count != 0)
+                        {
+                            List<Aperture> apertures = new List<Aperture>();
+                            foreach (Panel panel in panels)
+                            {
+                                List<Aperture> apertures_Temp = panel?.Apertures;
+                                if (apertures_Temp != null)
+                                {
+                                    apertures.AddRange(apertures_Temp);
+                                }
+                            }
+
+                            foreach(Panel panel_Temp in panels_Temp)
+                            {
+                                List<Aperture> apertures_Temp = panel_Temp?.Apertures;
+                                if (apertures_Temp != null)
+                                {
+                                    for(int i =0; i < apertures_Temp.Count; i++)
+                                    {
+                                        Aperture aperture_Temp = apertures_Temp[i];
+
+                                        Point3D point3D = aperture_Temp?.Face3D?.InternalPoint3D(Core.Tolerance.MacroDistance);
+                                        if (point3D == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        Aperture aperture = apertures.InRange(point3D, new Core.Range<double>(0, Core.Tolerance.MacroDistance), true, 1, Core.Tolerance.Distance)?.FirstOrDefault();
+                                        if (aperture == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        if(aperture.TryGetValue(ElementParameter.ElementId, out int @int))
+                                        {
+                                            apertures_Temp[i].SetValue(ElementParameter.ElementId, @int);
+                                            panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
+                                            panel_Temp.AddAperture(apertures_Temp[i]);
+                                        }
+                                    }
+
+                                    adjacencyCluster_Temp.AddObject(panel_Temp);
+                                }
+                            }
+                        }
 
                         analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster_Temp);
                         break;
                 }
-
 
                 if (analyticalModel == null)
                 {
@@ -358,7 +406,8 @@ namespace SAM.Analytical.Revit.UI
                                         elementId = null;
                                     }
                                 }
-                                else
+
+                                if (elementId == null)
                                 {
                                     elementId = panel.ElementId();
                                 }
@@ -381,7 +430,8 @@ namespace SAM.Analytical.Revit.UI
                                                 elementId = null;
                                             }
                                         }
-                                        else
+
+                                        if(elementId == null)
                                         {
                                             elementId = aperture.ElementId();
                                         }
