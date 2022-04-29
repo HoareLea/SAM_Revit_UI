@@ -10,6 +10,7 @@ using SAM.Geometry.Spatial;
 using SAM.Weather;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
@@ -77,6 +78,8 @@ namespace SAM.Analytical.Revit.UI
             GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.SAM;
             bool updateConstructionLayersByPanelType = false;
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
                 Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
@@ -455,6 +458,10 @@ namespace SAM.Analytical.Revit.UI
                     }
                 }
             }
+
+            stopwatch.Stop();
+
+            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}:{1}:{2}", stopwatch.Elapsed.Hours, stopwatch.Elapsed.Minutes, stopwatch.Elapsed.Seconds));
 
             return Result.Succeeded;
         }
