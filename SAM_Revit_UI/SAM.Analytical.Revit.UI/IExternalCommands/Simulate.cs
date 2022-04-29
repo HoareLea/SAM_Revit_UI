@@ -461,7 +461,25 @@ namespace SAM.Analytical.Revit.UI
 
             stopwatch.Stop();
 
-            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}:{1}:{2}", stopwatch.Elapsed.Hours, stopwatch.Elapsed.Minutes, stopwatch.Elapsed.Seconds));
+            string hoursString = stopwatch.Elapsed.Hours.ToString();
+            while(hoursString.Length < 2)
+            {
+                hoursString = "0" + hoursString;
+            }
+
+            string minutesString = stopwatch.Elapsed.Minutes.ToString();
+            while (minutesString.Length < 2)
+            {
+                minutesString = "0" + minutesString;
+            }
+
+            string secondsString = stopwatch.Elapsed.Seconds.ToString();
+            while (secondsString.Length < 2)
+            {
+                secondsString = "0" + secondsString;
+            }
+
+            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}h{1}m{2}s", hoursString, minutesString, secondsString));
 
             return Result.Succeeded;
         }
