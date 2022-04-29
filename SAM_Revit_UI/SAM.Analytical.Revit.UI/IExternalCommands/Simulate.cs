@@ -185,6 +185,20 @@ namespace SAM.Analytical.Revit.UI
                     return Result.Failed;
                 }
 
+                IEnumerable<Core.IMaterial> materials = Analytical.Query.Materials(analyticalModel.AdjacencyCluster, Analytical.Query.DefaultMaterialLibrary());
+                if(materials != null)
+                {
+                    foreach(Core.IMaterial material in materials)
+                    {
+                        if(analyticalModel.HasMaterial(material))
+                        {
+                            continue;
+                        }
+
+                        analyticalModel.AddMaterial(material);
+                    }
+                }
+
                 analyticalModel = updateConstructionLayersByPanelType ? analyticalModel.UpdateConstructionLayersByPanelType() : analyticalModel;
 
                 if (System.IO.File.Exists(path_TBD))
