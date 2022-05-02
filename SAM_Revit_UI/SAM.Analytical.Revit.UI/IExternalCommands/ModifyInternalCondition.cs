@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -34,11 +35,11 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            Reference reference = null;
+            IList<Reference> references = null;
 
             try
             {
-                reference = externalCommandData.Application.ActiveUIDocument.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+                references = externalCommandData.Application.ActiveUIDocument.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element);
             }
             catch
             {
@@ -46,13 +47,24 @@ namespace SAM.Analytical.Revit.UI
             }
 
 
-            if(reference == null)
+            if(references == null)
             {
                 return Result.Cancelled;
             }
 
-            Autodesk.Revit.DB.Mechanical.Space space_Revit = document.GetElement(reference) as Autodesk.Revit.DB.Mechanical.Space;
-            if(space_Revit == null)
+            List<Autodesk.Revit.DB.Mechanical.Space> spaces_Revit = null;
+            foreach(Reference reference in references)
+            {
+                Autodesk.Revit.DB.Mechanical.Space space_Revit = document.GetElement(reference) as Autodesk.Revit.DB.Mechanical.Space;
+                if (space_Revit == null)
+                {
+                    continue; ;
+                }
+
+                spaces_Revit.Add(space_Revit);
+            }
+
+            if(spaces_Revit == null || spaces_Revit.Count == 0)
             {
                 return Result.Failed;
             }
@@ -106,23 +118,59 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            Space space = spaces.Find(x => x.ElementId() == space_Revit.Id);
-            if(space == null)
+            List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>> tuples = new List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>>();
+            foreach(Autodesk.Revit.DB.Mechanical.Space space_Revit in spaces_Revit)
             {
-                return Result.Failed;
-            }
-
-            using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(space), profileLibrary, analyticalModel.AdjacencyCluster))
-            {
-                if(internalConditionForm.ShowDialog() != DialogResult.OK)
+                Space space = spaces.Find(x => x.ElementId() == space_Revit.Id);
+                if (space == null)
                 {
-                    return Result.Cancelled;
+                    continue;
                 }
 
-                space = internalConditionForm.Space;
-                profileLibrary = internalConditionForm.ProfileLibrary;
+                tuples.Add(new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space, space_Revit));
+            }
 
-                analyticalModel = new AnalyticalModel(analyticalModel, internalConditionForm.AdjacencyCluster);
+            if(tuples.Count == 1)
+            {
+                using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(tuples[0].Item1), profileLibrary, analyticalModel.AdjacencyCluster))
+                {
+                    if (internalConditionForm.ShowDialog() != DialogResult.OK)
+                    {
+                        return Result.Cancelled;
+                    }
+
+                    tuples[0] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(internalConditionForm.Space, tuples[0].Item2);
+                    profileLibrary = internalConditionForm.ProfileLibrary;
+
+                    analyticalModel = new AnalyticalModel(analyticalModel, internalConditionForm.AdjacencyCluster);
+                }
+            }
+            else
+            {
+                using (Windows.Forms.SpacesForm spacesForm = new Windows.Forms.SpacesForm(tuples.ConvertAll(x => x.Item1), analyticalModel.AdjacencyCluster, profileLibrary))
+                {
+                    if (spacesForm.ShowDialog() != DialogResult.OK)
+                    {
+                        return Result.Cancelled;
+                    }
+
+                    List<Space> spaces_Temp = spacesForm.Spaces?.ToList();
+
+                    for(int i =0; i < tuples.Count; i++)
+                    {
+                        Space space_Temp = spaces_Temp.Find(x => x.Guid == tuples[i].Item1.Guid);
+                        if(space_Temp == null)
+                        {
+                            continue;
+                        }
+
+                        tuples[i] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space_Temp, tuples[i].Item2);
+                    }
+
+                    profileLibrary = spacesForm.ProfileLibrary;
+
+                    analyticalModel = new AnalyticalModel(analyticalModel, spacesForm.AdjacencyCluster);
+                }
             }
 
             ConvertSettings convertSettings = new ConvertSettings(false, true, false);
@@ -139,13 +187,19 @@ namespace SAM.Analytical.Revit.UI
                     parameter.Set(Core.Convert.ToString(internalConditionLibrary));
                 }
 
-                Core.Revit.Modify.SetValues(space_Revit, space);
-                Core.Revit.Modify.SetValues(space_Revit, space, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
-                InternalCondition internalCondition = space.InternalCondition;
-                if (internalCondition != null)
+                foreach(Tuple<Space, Autodesk.Revit.DB.Mechanical.Space> tuple in tuples)
                 {
-                    Core.Revit.Modify.SetValues(space_Revit, internalCondition);
-                    Core.Revit.Modify.SetValues(space_Revit, internalCondition, ActiveSetting.Setting, convertSettings.GetParameters());
+                    Space space = tuple.Item1;
+                    Autodesk.Revit.DB.Mechanical.Space space_Revit = tuple.Item2;
+
+                    Core.Revit.Modify.SetValues(space_Revit, space);
+                    Core.Revit.Modify.SetValues(space_Revit, space, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
+                    InternalCondition internalCondition = space.InternalCondition;
+                    if (internalCondition != null)
+                    {
+                        Core.Revit.Modify.SetValues(space_Revit, internalCondition);
+                        Core.Revit.Modify.SetValues(space_Revit, internalCondition, ActiveSetting.Setting, convertSettings.GetParameters());
+                    }
                 }
 
                 transaction.Commit();
