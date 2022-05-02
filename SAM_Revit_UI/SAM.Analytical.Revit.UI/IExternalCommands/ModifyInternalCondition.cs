@@ -68,6 +68,30 @@ namespace SAM.Analytical.Revit.UI
                 transaction.RollBack();
             }
 
+            ProfileLibrary profileLibrary = null;
+
+            Parameter parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
+            if(parameter != null && parameter.HasValue && parameter.StorageType == StorageType.String)
+            {
+                string json = parameter.AsString();
+                if(!string.IsNullOrWhiteSpace(json))
+                {
+                    try
+                    {
+                        profileLibrary = Core.Convert.ToSAM<ProfileLibrary>(json)?.FirstOrDefault();
+                    }
+                    catch
+                    {
+                        profileLibrary = null;
+                    }
+                }
+            }
+
+            if(profileLibrary == null)
+            {
+                profileLibrary = Analytical.Query.DefaultProfileLibrary();
+            }
+
             List<Space> spaces = analyticalModel?.GetSpaces();
             if(spaces == null || spaces.Count == 0)
             {
@@ -80,14 +104,16 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            using (Windows.Forms.SpaceForm spaceForm = new Windows.Forms.SpaceForm(space, Analytical.Query.DefaultProfileLibrary(), analyticalModel.AdjacencyCluster, Core.Query.Enums(typeof(Space))))
+            //using (Windows.Forms.SpaceForm spaceForm = new Windows.Forms.SpaceForm(space, Analytical.Query.DefaultProfileLibrary(), analyticalModel.AdjacencyCluster, Core.Query.Enums(typeof(Space))))
+            using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(space), profileLibrary, analyticalModel.AdjacencyCluster))
             {
-                if(spaceForm.ShowDialog() != DialogResult.OK)
+                if(internalConditionForm.ShowDialog() != DialogResult.OK)
                 {
                     return Result.Cancelled;
                 }
 
-                space = spaceForm.Space;
+                space = internalConditionForm.Space;
+                profileLibrary = internalConditionForm.ProfileLibrary;
             }
 
             ConvertSettings convertSettings = new ConvertSettings(false, true, false);
@@ -97,6 +123,13 @@ namespace SAM.Analytical.Revit.UI
             using (Transaction transaction = new Transaction(document, "Modify Internal Condition"))
             {
                 transaction.Start();
+
+                parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
+                if(parameter != null && parameter.StorageType == StorageType.String)
+                {
+                    parameter.Set(Core.Convert.ToString(profileLibrary));
+                }
+
                 Core.Revit.Modify.SetValues(space_Revit, space);
                 Core.Revit.Modify.SetValues(space_Revit, space, ActiveSetting.Setting, parameters: convertSettings.GetParameters());
                 InternalCondition internalCondition = space.InternalCondition;
