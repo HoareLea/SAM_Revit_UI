@@ -69,27 +69,35 @@ namespace SAM.Analytical.Revit.UI
             }
 
             ProfileLibrary profileLibrary = null;
-
-            Parameter parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
-            if(parameter != null && parameter.HasValue && parameter.StorageType == StorageType.String)
-            {
-                string json = parameter.AsString();
-                if(!string.IsNullOrWhiteSpace(json))
-                {
-                    try
-                    {
-                        profileLibrary = Core.Convert.ToSAM<ProfileLibrary>(json)?.FirstOrDefault();
-                    }
-                    catch
-                    {
-                        profileLibrary = null;
-                    }
-                }
-            }
-
             if(profileLibrary == null)
             {
                 profileLibrary = Analytical.Query.DefaultProfileLibrary();
+            }
+
+            InternalConditionLibrary internalConditionLibrary = null;
+
+            Parameter parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
+            if (parameter != null && parameter.HasValue && parameter.StorageType == StorageType.String)
+            {
+                string json = parameter.AsString();
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    try
+                    {
+                        internalConditionLibrary = Core.Convert.ToSAM<InternalConditionLibrary>(json)?.FirstOrDefault();
+                        if(internalConditionLibrary != null)
+                        {
+                            foreach(InternalCondition internalCondition in internalConditionLibrary.GetInternalConditions())
+                            {
+                                analyticalModel?.AddInternalCondition(internalCondition);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        internalConditionLibrary = null;
+                    }
+                }
             }
 
             List<Space> spaces = analyticalModel?.GetSpaces();
@@ -104,7 +112,6 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            //using (Windows.Forms.SpaceForm spaceForm = new Windows.Forms.SpaceForm(space, Analytical.Query.DefaultProfileLibrary(), analyticalModel.AdjacencyCluster, Core.Query.Enums(typeof(Space))))
             using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(space), profileLibrary, analyticalModel.AdjacencyCluster))
             {
                 if(internalConditionForm.ShowDialog() != DialogResult.OK)
@@ -114,6 +121,8 @@ namespace SAM.Analytical.Revit.UI
 
                 space = internalConditionForm.Space;
                 profileLibrary = internalConditionForm.ProfileLibrary;
+
+                analyticalModel = new AnalyticalModel(analyticalModel, internalConditionForm.AdjacencyCluster);
             }
 
             ConvertSettings convertSettings = new ConvertSettings(false, true, false);
@@ -127,7 +136,7 @@ namespace SAM.Analytical.Revit.UI
                 parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
                 if(parameter != null && parameter.StorageType == StorageType.String)
                 {
-                    parameter.Set(Core.Convert.ToString(profileLibrary));
+                    parameter.Set(Core.Convert.ToString(internalConditionLibrary));
                 }
 
                 Core.Revit.Modify.SetValues(space_Revit, space);
