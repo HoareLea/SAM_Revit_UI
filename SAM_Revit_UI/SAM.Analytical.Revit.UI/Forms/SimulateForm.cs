@@ -1,15 +1,13 @@
 ﻿using SAM.Weather;
 using System;
 using System.Windows.Forms;
-using SAM.Core.Windows;
 using System.Linq;
+using SAM.Analytical.Windows;
 
 namespace SAM.Analytical.Revit.UI.Forms
 {
     public partial class SimulateForm : Form
     {
-        private WeatherData weatherData;
-
         public SimulateForm()
         {
             InitializeComponent();
@@ -19,15 +17,12 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             InitializeComponent();
 
-            TextBox_OutputDirectory.Text = outputDirectory;
-            TextBox_ProjectName.Text = projectName;
+            SimulateControl_Main.OutputDirectory = outputDirectory;
+            SimulateControl_Main.ProjectName = projectName;
         }
 
         private void SimulateForm_Load(object sender, EventArgs e)
         {
-            ComboBoxControl_SolarCalculationMethod.AddRange(Enum.GetValues(typeof(SolarCalculationMethod)).Cast<Enum>(), (Enum x) => Core.Query.Description(x));
-            ComboBoxControl_SolarCalculationMethod.SetSelectedItem(SolarCalculationMethod.SAM);
-
             ComboBoxControl_GeometryCalculationMethod.AddRange(Enum.GetValues(typeof(GeometryCalculationMethod)).Cast<Enum>().ToList().FindAll(x => !x.Equals( GeometryCalculationMethod.Undefined)), (Enum x) => Core.Query.Description(x));
             ComboBoxControl_GeometryCalculationMethod.SetSelectedItem(GeometryCalculationMethod.SAM);
         }
@@ -46,7 +41,7 @@ namespace SAM.Analytical.Revit.UI.Forms
                 return;
             }
 
-            if(weatherData == null)
+            if(SimulateControl_Main.WeatherData == null)
             {
                 MessageBox.Show("Provide Wether Data");
                 return;
@@ -68,7 +63,7 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return TextBox_OutputDirectory.Text;
+                return SimulateControl_Main.OutputDirectory;
             }
         }
 
@@ -76,7 +71,7 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return TextBox_ProjectName.Text;
+                return SimulateControl_Main.ProjectName;
             }
         }
 
@@ -84,13 +79,12 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return weatherData;
+                return SimulateControl_Main.WeatherData;
             }
 
             set
             {
-                weatherData = value;
-                TextBox_WeatherData.Text = string.IsNullOrWhiteSpace(weatherData?.Name) ? "???" : weatherData.Name;
+                SimulateControl_Main.WeatherData = value;
             }
         }
 
@@ -98,7 +92,7 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return CheckBox_UnmetHours.Checked;
+                return SimulateControl_Main.UnmetHours;
             }
         }
 
@@ -106,7 +100,7 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return ComboBoxControl_SolarCalculationMethod.GetSelectedItem<SolarCalculationMethod>();
+                return SimulateControl_Main.SolarCalculationMethod;
             }
         }
 
@@ -122,37 +116,8 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return CheckBox_UpdateConstructionLayersByPanelType.Checked;
+                return SimulateControl_Main.UpdateConstructionLayersByPanelType;
             }
-        }
-
-        private void Button_OutputDirectory_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                folderBrowserDialog.Description = "Select Output Directory";
-                folderBrowserDialog.ShowNewFolderButton = true;
-                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-                {
-                    TextBox_OutputDirectory.Text = folderBrowserDialog.SelectedPath;
-                    TextBox_OutputDirectory.SelectionStart = TextBox_OutputDirectory.Text.Length;
-                    TextBox_OutputDirectory.SelectionLength = 0;
-                }
-            }
-        }
-
-        private void Button_WeatherData_Click(object sender, EventArgs e)
-        {
-            Autodesk.Revit.UI.Result result = Query.TryGetWeatherData(out WeatherData weatherData_Temp);
-
-            if(result != Autodesk.Revit.UI.Result.Succeeded || weatherData_Temp == null)
-            {
-                return;
-            }
-
-            weatherData = weatherData_Temp;
-
-            TextBox_WeatherData.Text = string.IsNullOrWhiteSpace(weatherData?.Name) ? "???" : weatherData.Name;
         }
     }
 }

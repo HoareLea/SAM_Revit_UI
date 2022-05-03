@@ -210,7 +210,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\GeometryCalculationMethod.cs" />
-    <Compile Include="Enums\SolarCalculationMethod.cs" />
     <Compile Include="Forms\SimulateForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -243,7 +242,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Query\WeatherData.cs" />
     <Compile Include="Query\DayTypes.cs" />
     <Compile Include="Query\ParameterNames.cs" />
   </ItemGroup>

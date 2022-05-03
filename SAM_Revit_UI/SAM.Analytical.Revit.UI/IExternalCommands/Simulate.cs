@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
+using SAM.Analytical.Windows;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
 using SAM.Core.Tas;
@@ -78,8 +79,6 @@ namespace SAM.Analytical.Revit.UI
             GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.SAM;
             bool updateConstructionLayersByPanelType = false;
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
                 Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
@@ -98,6 +97,9 @@ namespace SAM.Analytical.Revit.UI
                 geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
                 updateConstructionLayersByPanelType = simulateForm.UpdateConstructionLayersByPanelType;
             }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.Undefined)
             {
