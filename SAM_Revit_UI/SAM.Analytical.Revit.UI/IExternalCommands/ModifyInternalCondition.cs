@@ -173,6 +173,20 @@ namespace SAM.Analytical.Revit.UI
                 }
             }
 
+            IEnumerable<InternalCondition> internalConditions = analyticalModel?.AdjacencyCluster?.GetInternalConditions(false, true);
+            if (internalConditions != null)
+            {
+                if(internalConditionLibrary == null)
+                {
+                    internalConditionLibrary = new InternalConditionLibrary(analyticalModel.Name);
+                }
+
+                foreach(InternalCondition internalCondition in internalConditions)
+                {
+                    internalConditionLibrary.Add(internalCondition);
+                }
+            }
+
             ConvertSettings convertSettings = new ConvertSettings(false, true, false);
             convertSettings.AddParameter("AdjacencyCluster", analyticalModel.AdjacencyCluster);
             convertSettings.AddParameter("AnalyticalModel", analyticalModel);
