@@ -52,7 +52,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Cancelled;
             }
 
-            List<Autodesk.Revit.DB.Mechanical.Space> spaces_Revit = null;
+            List<Autodesk.Revit.DB.Mechanical.Space> spaces_Revit = new List<Autodesk.Revit.DB.Mechanical.Space>();
             foreach(Reference reference in references)
             {
                 Autodesk.Revit.DB.Mechanical.Space space_Revit = document.GetElement(reference) as Autodesk.Revit.DB.Mechanical.Space;
