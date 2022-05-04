@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
-using SAM.Analytical.Windows;
+using SAM.Analytical.UI;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
 using SAM.Core.Tas;

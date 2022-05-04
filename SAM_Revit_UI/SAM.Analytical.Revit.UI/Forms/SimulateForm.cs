@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 using System.Linq;
-using SAM.Analytical.Windows;
+using SAM.Analytical.UI;
 
 namespace SAM.Analytical.Revit.UI.Forms
 {

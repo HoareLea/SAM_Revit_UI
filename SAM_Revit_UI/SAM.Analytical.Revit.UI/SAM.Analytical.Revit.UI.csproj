@@ -158,6 +158,9 @@
     <Reference Include="SAM.Analytical.Topologic">
       <HintPath>..\..\..\SAM_Topologic\build\SAM.Analytical.Topologic.dll</HintPath>
     </Reference>
+    <Reference Include="SAM.Analytical.UI">
+      <HintPath>..\..\..\SAM_UI\build\SAM.Analytical.UI.exe</HintPath>
+    </Reference>
     <Reference Include="SAM.Analytical.Windows">
       <HintPath>..\..\..\SAM_Windows\build\SAM.Analytical.Windows.dll</HintPath>
     </Reference>

@@ -32,7 +32,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Button_Cancel = new System.Windows.Forms.Button();
             this.Button_OK = new System.Windows.Forms.Button();
             this.ComboBoxControl_GeometryCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
-            this.SimulateControl_Main = new SAM.Analytical.Windows.Controls.SimulateControl();
+            this.SimulateControl_Main = new SAM.Analytical.UI.Controls.SimulateControl();
             this.SuspendLayout();
             // 
             // Button_Cancel
@@ -74,7 +74,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.SimulateControl_Main.OutputDirectory = "";
             this.SimulateControl_Main.ProjectName = "";
             this.SimulateControl_Main.Size = new System.Drawing.Size(470, 331);
-            this.SimulateControl_Main.SolarCalculationMethod = SAM.Analytical.Windows.SolarCalculationMethod.SAM;
+            this.SimulateControl_Main.SolarCalculationMethod = SAM.Analytical.UI.SolarCalculationMethod.SAM;
             this.SimulateControl_Main.TabIndex = 2;
             this.SimulateControl_Main.UnmetHours = false;
             this.SimulateControl_Main.UpdateConstructionLayersByPanelType = true;
@@ -104,6 +104,6 @@ namespace SAM.Analytical.Revit.UI.Forms
         private System.Windows.Forms.Button Button_Cancel;
         private System.Windows.Forms.Button Button_OK;
         private Core.Windows.ComboBoxControl ComboBoxControl_GeometryCalculationMethod;
-        private Analytical.Windows.Controls.SimulateControl SimulateControl_Main;
+        private Analytical.UI.Controls.SimulateControl SimulateControl_Main;
     }
 }
