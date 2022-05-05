@@ -108,9 +108,9 @@ namespace SAM.Analytical.Revit.UI
 
             AnalyticalModel analyticalModel = null;
 
-            string path_TBD = System.IO.Path.Combine(outputDirectory, projectName + ".tbd");
-
             bool simulate = false;
+
+            string path_TBD = System.IO.Path.Combine(outputDirectory, projectName + ".tbd");
 
             Dictionary<Guid, ElementId> dictionary = null;
             using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
@@ -537,6 +537,10 @@ namespace SAM.Analytical.Revit.UI
                     }
                 }
             }
+
+            string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
+
+            Core.Convert.ToFile(analyticalModel, path_SAM);
 
             stopwatch.Stop();
 
