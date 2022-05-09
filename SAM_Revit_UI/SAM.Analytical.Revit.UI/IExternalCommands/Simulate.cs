@@ -116,198 +116,7 @@ namespace SAM.Analytical.Revit.UI
             using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
             {
                 simpleProgressForm.Increment("Converting Model");
-
-                List<Panel> panels_Temp = null;
-                AdjacencyCluster adjacencyCluster_Temp = null;
-                IEnumerable<Panel> panels = null;
-                List<Shell> shells = null;
-                IEnumerable<Space> spaces = null;
-                ConvertSettings convertSettings = null;
-
-                switch (geometryCalculationMethod)
-                {
-                    case GeometryCalculationMethod.gbXML:
-                        dictionary = new Dictionary<Guid, ElementId>();
-                        using (Transaction transaction = new Transaction(document, "Convert Model"))
-                        {
-                            transaction.Start();
-
-                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-                            panels_Temp = analyticalModel?.GetPanels();
-                            if (panels_Temp != null)
-                            {
-                                foreach (Panel panel in panels_Temp)
-                                {
-                                    EnergyAnalysisSurface energyAnalysisSurface = Core.Revit.Query.Element<EnergyAnalysisSurface>(document, panel);
-                                    HostObject hostObject = Core.Revit.Query.Element(document, energyAnalysisSurface?.CADObjectUniqueId, energyAnalysisSurface?.CADLinkUniqueId) as HostObject;
-                                    if (hostObject != null)
-                                    {
-                                        dictionary[panel.Guid] = hostObject.Id;
-                                    }
-
-                                    List<Aperture> apertures = panel.Apertures;
-                                    if (apertures != null)
-                                    {
-                                        foreach (Aperture aperture in apertures)
-                                        {
-                                            EnergyAnalysisOpening energyAnalysisOpening = Core.Revit.Query.Element<EnergyAnalysisOpening>(document, aperture);
-                                            FamilyInstance familyInstance = Core.Revit.Query.Element(energyAnalysisOpening) as FamilyInstance;
-                                            if (familyInstance != null)
-                                            {
-                                                dictionary[aperture.Guid] = familyInstance.Id;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            transaction.RollBack();
-                        }
-                        break;
-
-                    case GeometryCalculationMethod.SAM:
-                        using (Transaction transaction = new Transaction(document, "Convert Model"))
-                        {
-                            transaction.Start();
-
-                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-
-                            transaction.RollBack();
-                        }
-
-                        convertSettings = new ConvertSettings(true, true, true);
-                        panels = Convert.ToSAM<Panel>(document, convertSettings);
-
-                        shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
-                        if(shells == null || shells.Count == 0)
-                        {
-                            return Result.Failed;
-                        }
-
-                        spaces = Convert.ToSAM<Space>(document, convertSettings);
-
-                        adjacencyCluster_Temp = Analytical.Create.AdjacencyCluster(shells, spaces, panels, false, true, 0.01, Core.Tolerance.MacroDistance, 0.01, 0.0872664626, Core.Tolerance.MacroDistance, Core.Tolerance.Distance, Core.Tolerance.Angle);
-                        panels_Temp = adjacencyCluster_Temp.GetPanels();
-                        if(panels_Temp != null && panels_Temp.Count != 0)
-                        {
-                            List<Aperture> apertures = new List<Aperture>();
-                            foreach (Panel panel in panels)
-                            {
-                                List<Aperture> apertures_Temp = panel?.Apertures;
-                                if (apertures_Temp != null)
-                                {
-                                    apertures.AddRange(apertures_Temp);
-                                }
-                            }
-
-                            foreach(Panel panel_Temp in panels_Temp)
-                            {
-                                List<Aperture> apertures_Temp = panel_Temp?.Apertures;
-                                if (apertures_Temp != null)
-                                {
-                                    for(int i =0; i < apertures_Temp.Count; i++)
-                                    {
-                                        Aperture aperture_Temp = apertures_Temp[i];
-
-                                        Point3D point3D = aperture_Temp?.Face3D?.InternalPoint3D(Core.Tolerance.MacroDistance);
-                                        if (point3D == null)
-                                        {
-                                            continue;
-                                        }
-
-                                        Aperture aperture = apertures.InRange(point3D, new Core.Range<double>(0, Core.Tolerance.MacroDistance), true, 1, Core.Tolerance.Distance)?.FirstOrDefault();
-                                        if (aperture == null)
-                                        {
-                                            continue;
-                                        }
-
-                                        if(aperture.TryGetValue(ElementParameter.ElementId, out int @int))
-                                        {
-                                            apertures_Temp[i].SetValue(ElementParameter.ElementId, @int);
-                                            panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
-                                            panel_Temp.AddAperture(apertures_Temp[i]);
-                                        }
-                                    }
-
-                                    adjacencyCluster_Temp.AddObject(panel_Temp);
-                                }
-                            }
-                        }
-
-                        analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster_Temp);
-                        break;
-
-                    case GeometryCalculationMethod.Topologic:
-                        using (Transaction transaction = new Transaction(document, "Convert Model"))
-                        {
-                            transaction.Start();
-
-                            analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
-
-                            transaction.RollBack();
-                        }
-
-                        convertSettings = new ConvertSettings(true, true, true);
-                        panels = Convert.ToSAM<Panel>(document, convertSettings);
-
-                        shells = Analytical.Query.Shells(panels, 0.1, Core.Tolerance.MacroDistance);
-                        if (shells == null || shells.Count == 0)
-                        {
-                            return Result.Failed;
-                        }
-
-                        spaces = Convert.ToSAM<Space>(document, convertSettings);
-                        adjacencyCluster_Temp = Topologic.Create.AdjacencyCluster(spaces, panels, out List<global::Topologic.Topology> topologies, out List<Panel> redundantPanels);
-                        panels_Temp = adjacencyCluster_Temp.GetPanels();
-                        if (panels_Temp != null && panels_Temp.Count != 0)
-                        {
-                            List<Aperture> apertures = new List<Aperture>();
-                            foreach (Panel panel in panels)
-                            {
-                                List<Aperture> apertures_Temp = panel?.Apertures;
-                                if (apertures_Temp != null)
-                                {
-                                    apertures.AddRange(apertures_Temp);
-                                }
-                            }
-
-                            foreach (Panel panel_Temp in panels_Temp)
-                            {
-                                List<Aperture> apertures_Temp = panel_Temp?.Apertures;
-                                if (apertures_Temp != null)
-                                {
-                                    for (int i = 0; i < apertures_Temp.Count; i++)
-                                    {
-                                        Aperture aperture_Temp = apertures_Temp[i];
-
-                                        Point3D point3D = aperture_Temp?.Face3D?.InternalPoint3D(Core.Tolerance.MacroDistance);
-                                        if (point3D == null)
-                                        {
-                                            continue;
-                                        }
-
-                                        Aperture aperture = apertures.InRange(point3D, new Core.Range<double>(0, Core.Tolerance.MacroDistance), true, 1, Core.Tolerance.Distance)?.FirstOrDefault();
-                                        if (aperture == null)
-                                        {
-                                            continue;
-                                        }
-
-                                        if (aperture.TryGetValue(ElementParameter.ElementId, out int @int))
-                                        {
-                                            apertures_Temp[i].SetValue(ElementParameter.ElementId, @int);
-                                            panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
-                                            panel_Temp.AddAperture(apertures_Temp[i]);
-                                        }
-                                    }
-
-                                    adjacencyCluster_Temp.AddObject(panel_Temp);
-                                }
-                            }
-                        }
-
-                        analyticalModel = new AnalyticalModel(analyticalModel, adjacencyCluster_Temp);
-                        break;
-                }
+                analyticalModel = Convert.ToSAM(document, geometryCalculationMethod, out dictionary);
 
                 if (analyticalModel == null)
                 {
@@ -466,15 +275,15 @@ namespace SAM.Analytical.Revit.UI
 
                             if (sAMObject is SpaceSimulationResult)
                             {
-                                Convert.ToRevit(adjacencyCluster, (SpaceSimulationResult)sAMObject, document, convertSettings)?.Cast<Element>().ToList();
+                                Revit.Convert.ToRevit(adjacencyCluster, (SpaceSimulationResult)sAMObject, document, convertSettings)?.Cast<Element>().ToList();
                             }
                             else if (sAMObject is ZoneSimulationResult)
                             {
-                                Convert.ToRevit(adjacencyCluster, (ZoneSimulationResult)sAMObject, document, convertSettings)?.Cast<Element>().ToList();
+                                Revit.Convert.ToRevit(adjacencyCluster, (ZoneSimulationResult)sAMObject, document, convertSettings)?.Cast<Element>().ToList();
                             }
                             else if (sAMObject is AdjacencyClusterSimulationResult)
                             {
-                                Convert.ToRevit((AdjacencyClusterSimulationResult)sAMObject, document, convertSettings);
+                                Revit.Convert.ToRevit((AdjacencyClusterSimulationResult)sAMObject, document, convertSettings);
                             }
                             else if (sAMObject is Panel)
                             {
