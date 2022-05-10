@@ -143,8 +143,15 @@ namespace SAM.Analytical.Revit.UI
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
                 saveFileDialog.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
-                saveFileDialog.FilterIndex = 2;
+                saveFileDialog.FilterIndex = 1;
                 saveFileDialog.RestoreDirectory = true;
+
+                string path_Document = document.PathName;
+                if(!string.IsNullOrWhiteSpace(path_Document))
+                {
+                    saveFileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(path_Document);
+                    saveFileDialog.FileName = System.IO.Path.GetFileNameWithoutExtension(path_Document) + ".json";
+                }
 
                 if (saveFileDialog.ShowDialog(ExternalApplication.WindowHandle) != DialogResult.OK)
                 {
@@ -154,7 +161,7 @@ namespace SAM.Analytical.Revit.UI
                 path = saveFileDialog.FileName;
             }
 
-            if (string.IsNullOrWhiteSpace(path) || !System.IO.File.Exists(path))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 return Result.Failed;
             }
@@ -167,6 +174,8 @@ namespace SAM.Analytical.Revit.UI
                 {
                     return Result.Cancelled;
                 }
+
+                geometryCalculationMethod = comboBoxForm.SelectedItem;
             }
 
             Stopwatch stopwatch = new Stopwatch();
