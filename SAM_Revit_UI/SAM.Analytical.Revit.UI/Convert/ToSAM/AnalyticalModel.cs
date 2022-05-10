@@ -277,6 +277,97 @@ namespace SAM.Analytical.Revit.UI
                 }
             }
 
+            if(panels != null)
+            {
+                foreach(Panel panel in panels)
+                {
+                    ElementId elementId = null;
+                    if (dictionary == null || !dictionary.TryGetValue(panel.Guid, out elementId))
+                    {
+                        elementId = null;
+                    }
+
+                    if (elementId == null)
+                    {
+                        elementId = panel.ElementId();
+                    }
+
+                    if (elementId == null)
+                    {
+                        continue;
+                    }
+
+                    Element element = document.GetElement(elementId);
+                    if (element == null)
+                    {
+                        continue;
+                    }
+
+                    IEnumerable<ElementId> elementIds = element.GetDependentElements(new ElementClassFilter(typeof(IndependentTag)));
+                    if (elementIds != null)
+                    {
+                        foreach (ElementId elementId_Temp in elementIds)
+                        {
+                            IndependentTag independentTag = document.GetElement(elementId_Temp) as IndependentTag;
+                            Tag tag = Geometry.Revit.Convert.ToSAM(independentTag, convertSettings);
+                            if (tag == null)
+                            {
+                                continue;
+                            }
+
+                            adjacencyCluster_Temp.AddObject(tag);
+                            adjacencyCluster_Temp.AddRelation(element, tag);
+                        }
+                    }
+
+                    List<Aperture> apertures = panel.Apertures;
+                    if(apertures != null)
+                    {
+                        foreach(Aperture aperture in apertures)
+                        {
+                            ElementId elementId_Aperture = null;
+                            if (dictionary == null || !dictionary.TryGetValue(panel.Guid, out elementId_Aperture))
+                            {
+                                elementId_Aperture = null;
+                            }
+
+                            if (elementId_Aperture == null)
+                            {
+                                elementId_Aperture = panel.ElementId();
+                            }
+
+                            if (elementId_Aperture == null)
+                            {
+                                continue;
+                            }
+
+                            Element element_Aperture = document.GetElement(elementId_Aperture);
+                            if (element_Aperture == null)
+                            {
+                                continue;
+                            }
+
+                            IEnumerable<ElementId> elementIds_Aperture = element_Aperture.GetDependentElements(new ElementClassFilter(typeof(IndependentTag)));
+                            if (elementIds_Aperture != null)
+                            {
+                                foreach (ElementId elementId_Temp in elementIds_Aperture)
+                                {
+                                    IndependentTag independentTag = document.GetElement(elementId_Temp) as IndependentTag;
+                                    Tag tag = Geometry.Revit.Convert.ToSAM(independentTag, convertSettings);
+                                    if (tag == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    adjacencyCluster_Temp.AddObject(tag);
+                                    adjacencyCluster_Temp.AddRelation(panel, tag);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if(adjacencyCluster_Temp == null || result == null)
             {
                 return null;

@@ -228,6 +228,7 @@
     <Compile Include="IExternalCommands\AddWindowAndDoorTags.cs" />
     <Compile Include="IExternalCommands\CreateFloorPlans.cs" />
     <Compile Include="IExternalCommands\CopyWall.cs" />
+    <Compile Include="IExternalCommands\ImportExportTags.cs" />
     <Compile Include="IExternalCommands\ModifyInternalCondition.cs" />
     <Compile Include="IExternalCommands\OpenViewers.cs" />
     <Compile Include="IExternalCommands\Simulate.cs" />
