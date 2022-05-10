@@ -150,7 +150,7 @@ namespace SAM.Analytical.Revit.UI
 
                         simpleProgressForm.Increment((document.GetElement(tuple.Item1) as ElementType)?.FamilyName);
 
-                        List<IndependentTag> independentTags = Core.Revit.Modify.TagElements(document, templateNames, tuple.Item1, tuple.Item2.ConvertAll(x => x.Id), false, TagOrientation.Horizontal, new ViewType[] { ViewType.FloorPlan });
+                        List<IndependentTag> independentTags = Core.Revit.Modify.TagElements(document, templateNames, tuple.Item1, tuple.Item2.ConvertAll(x => x.Id), false, TagOrientation.Horizontal, new ViewType[] { ViewType.FloorPlan }, false);
                     }
 
                     simpleProgressForm.Increment("Finishing");
