@@ -3,7 +3,9 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -157,58 +159,54 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            AnalyticalModel analyticalModel = Core.Convert.ToSAM<AnalyticalModel>(path)?.FirstOrDefault();
+            GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.Undefined;
+            using (Core.Windows.Forms.ComboBoxForm<GeometryCalculationMethod> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<GeometryCalculationMethod>("Geometry Calculation Method"))
+            {
+                comboBoxForm.SelectedItem = geometryCalculationMethod;
+                if(comboBoxForm.ShowDialog() != DialogResult.OK)
+                {
+                    return Result.Cancelled;
+                }
+            }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            AnalyticalModel analyticalModel = Convert.ToSAM(document, geometryCalculationMethod, out Dictionary<Guid, ElementId> dictionary);
+            if(analyticalModel == null)
+            {
+                return Result.Failed;
+            }
+
+            Core.Convert.ToSAM<AnalyticalModel>(path)?.FirstOrDefault();
             if (analyticalModel == null)
             {
                 return Result.Failed;
             }
 
-            List<Architectural.Level> levels = null;
+            Core.Convert.ToFile(analyticalModel, path);
 
-            List<Panel> panels = analyticalModel.GetPanels();
-            if (panels != null)
+            stopwatch.Stop();
+
+            string hoursString = stopwatch.Elapsed.Hours.ToString();
+            while (hoursString.Length < 2)
             {
-                levels = Architectural.Create.Levels(panels);
+                hoursString = "0" + hoursString;
             }
 
-            Core.Revit.ConvertSettings convertSettings = new Core.Revit.ConvertSettings(true, true, true);
-            convertSettings.AddParameter("AnalyticalModel", analyticalModel);
-
-            using (Transaction transaction = new Transaction(document, "Load Analytical Model"))
+            string minutesString = stopwatch.Elapsed.Minutes.ToString();
+            while (minutesString.Length < 2)
             {
-                transaction.Start();
-
-                List<Element> elements = new List<Element>();
-
-                using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Lad Analytical Model", string.Empty, 4))
-                {
-                    simpleProgressForm.Increment("Creating Levels");
-
-                    foreach (Architectural.Level level in levels)
-                    {
-                        Level level_Revit = Architectural.Revit.Convert.ToRevit(level, document, convertSettings);
-                        if (level_Revit != null)
-                        {
-                            elements.Add(level_Revit);
-                        }
-                    }
-
-                    simpleProgressForm.Increment("Creating Model");
-
-                    List<Element> elements_AnalyticalModel = Revit.Convert.ToRevit(analyticalModel, document, convertSettings);
-                    if (elements_AnalyticalModel != null)
-                    {
-                        elements.AddRange(elements_AnalyticalModel);
-                    }
-
-                    simpleProgressForm.Increment("Coping Parameters");
-                    Modify.CopySpatialElementParameters(document, Tool.TAS);
-
-                    simpleProgressForm.Increment("Finishing");
-                }
-
-                transaction.Commit();
+                minutesString = "0" + minutesString;
             }
+
+            string secondsString = stopwatch.Elapsed.Seconds.ToString();
+            while (secondsString.Length < 2)
+            {
+                secondsString = "0" + secondsString;
+            }
+
+            MessageBox.Show(string.Format("Model Exported.\nTime elapsed: {0}h {1}m {2}s", hoursString, minutesString, secondsString));
 
             return Result.Succeeded;
         }
