@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
+using SAM.Geometry.Revit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -71,9 +72,35 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
+            List<Tag> tags = Core.Convert.ToSAM<Tag>(path);
+            if(tags == null)
+            {
+                return Result.Failed;
+            }
+
             using (Transaction transaction = new Transaction(document, "Import Tags"))
             {
                 transaction.Start();
+
+                foreach(Tag tag in tags)
+                {
+                    Core.IntegerId integerId = tag.ReferenceId;
+                    if(integerId == null)
+                    {
+                        continue;
+                    }
+
+                    Element element = Core.Revit.Query.Element<Element>(document, integerId);
+
+                    if(element is Autodesk.Revit.DB.Mechanical.Space)
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
 
                 transaction.Commit();
             }
