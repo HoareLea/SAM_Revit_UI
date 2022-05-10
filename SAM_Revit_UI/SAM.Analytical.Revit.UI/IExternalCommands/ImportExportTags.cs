@@ -16,9 +16,9 @@ namespace SAM.Analytical.Revit.UI
     [Regeneration(RegenerationOption.Manual)]
     public class ImportExportTags : ISAMRibbonItemData
     {
-        public string RibbonPanelName => "Tools";
+        public string RibbonPanelName => "Project Setup";
 
-        public int Index => 7;
+        public int Index => 18;
 
         public void Create(RibbonPanel ribbonPanel)
         {
