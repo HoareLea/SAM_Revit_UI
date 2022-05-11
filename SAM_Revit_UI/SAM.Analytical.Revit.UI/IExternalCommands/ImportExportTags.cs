@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit;
@@ -78,28 +79,30 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
+            ConvertSettings convertSettings = new ConvertSettings(true, true, true);
+
             using (Transaction transaction = new Transaction(document, "Import Tags"))
             {
                 transaction.Start();
 
                 foreach(Tag tag in tags)
                 {
-                    Core.IntegerId integerId = tag.ReferenceId;
-                    if(integerId == null)
+                    BuiltInCategory? builtInCategory = tag.BuiltInCategory();
+                    if(builtInCategory == null || !builtInCategory.HasValue)
                     {
                         continue;
                     }
 
-                    Element element = Core.Revit.Query.Element<Element>(document, integerId);
-
-                    if(element is Autodesk.Revit.DB.Mechanical.Space)
+                    if(builtInCategory != BuiltInCategory.OST_MEPSpaceTags)
                     {
-
+                        IndependentTag independentTag = Geometry.Revit.Convert.ToRevit(tag, document, convertSettings);
                     }
                     else
                     {
-
+                        SpaceTag spaceTag = Geometry.Revit.Convert.ToRevit_SpaceTag(tag, document, convertSettings);
                     }
+                    
+                    
                 }
 
                 transaction.Commit();
