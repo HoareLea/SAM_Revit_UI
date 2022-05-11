@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
+using SAM.Core.Windows;
 using SAM.Geometry.Revit;
 using System;
 using System.Collections.Generic;
@@ -81,31 +82,54 @@ namespace SAM.Analytical.Revit.UI
 
             ConvertSettings convertSettings = new ConvertSettings(true, true, true);
 
-            using (Transaction transaction = new Transaction(document, "Import Tags"))
+            if(tags.Count != 0)
             {
-                transaction.Start();
-
-                foreach(Tag tag in tags)
+                using (Transaction transaction = new Transaction(document, "Import Tags"))
                 {
-                    BuiltInCategory? builtInCategory = tag.BuiltInCategory();
-                    if(builtInCategory == null || !builtInCategory.HasValue)
+                    transaction.Start();
+                    using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Importing Tags", string.Empty, tags.Count))
                     {
-                        continue;
+                        foreach (Tag tag in tags)
+                        {
+                            string name = tag?.Name;
+                            if(string.IsNullOrWhiteSpace(name))
+                            {
+                                name = "???";
+                            }
+
+                            simpleProgressForm.Increment(name);
+                            if(tag == null)
+                            {
+                                continue;
+                            }
+
+                            if(tag.Placed(document))
+                            {
+                                continue;
+                            }
+
+                            BuiltInCategory? builtInCategory = tag.BuiltInCategory();
+                            if (builtInCategory == null || !builtInCategory.HasValue)
+                            {
+                                continue;
+                            }
+
+                            if (builtInCategory != BuiltInCategory.OST_MEPSpaceTags)
+                            {
+                                IndependentTag independentTag = Geometry.Revit.Convert.ToRevit(tag, document, convertSettings);
+                            }
+                            else
+                            {
+                                SpaceTag spaceTag = Geometry.Revit.Convert.ToRevit_SpaceTag(tag, document, convertSettings);
+                            }
+
+
+                        }
                     }
 
-                    if(builtInCategory != BuiltInCategory.OST_MEPSpaceTags)
-                    {
-                        IndependentTag independentTag = Geometry.Revit.Convert.ToRevit(tag, document, convertSettings);
-                    }
-                    else
-                    {
-                        SpaceTag spaceTag = Geometry.Revit.Convert.ToRevit_SpaceTag(tag, document, convertSettings);
-                    }
-                    
-                    
+
+                    transaction.Commit();
                 }
-
-                transaction.Commit();
             }
 
             return Result.Succeeded;
