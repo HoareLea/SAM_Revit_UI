@@ -145,13 +145,13 @@ namespace SAM.Analytical.Revit.UI
 
             ConvertSettings convertSettings = new ConvertSettings(true, true, true);
 
-            List<Geometry.Revit.Tag> tags = new List<Geometry.Revit.Tag>();
+            List<Tag> tags = new List<Tag>();
             foreach(Element element in elements)
             {
-                Geometry.Revit.Tag tag = null;
-                if (element is Autodesk.Revit.DB.Mechanical.SpaceTag)
+                Tag tag = null;
+                if (element is SpaceTag)
                 {
-                    tag = Geometry.Revit.Convert.ToSAM((Autodesk.Revit.DB.Mechanical.SpaceTag)element, convertSettings);
+                    tag = Geometry.Revit.Convert.ToSAM((SpaceTag)element, convertSettings);
                 }
                 else if (element is IndependentTag)
                 {

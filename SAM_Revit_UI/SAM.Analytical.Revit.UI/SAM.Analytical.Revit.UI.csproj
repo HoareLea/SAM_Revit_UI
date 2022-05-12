@@ -218,6 +218,12 @@
   <ItemGroup>
     <Compile Include="Convert\ToSAM\AnalyticalModel.cs" />
     <Compile Include="Enums\GeometryCalculationMethod.cs" />
+    <Compile Include="Forms\CopyTagsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CopyTagsForm.Designer.cs">
+      <DependentUpon>CopyTagsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SimulateForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -226,6 +232,7 @@
     </Compile>
     <Compile Include="IExternalCommandAvailabilities\AlwaysAvailableExternalCommandAvailability.cs" />
     <Compile Include="IExternalCommands\AddWindowAndDoorTags.cs" />
+    <Compile Include="IExternalCommands\CopyTags.cs" />
     <Compile Include="IExternalCommands\CreateFloorPlans.cs" />
     <Compile Include="IExternalCommands\CopyWall.cs" />
     <Compile Include="IExternalCommands\ImportExportTags.cs" />
@@ -245,6 +252,7 @@
     <Compile Include="IExternalCommands\AddParameters.cs" />
     <Compile Include="IExternalCommands\RemoveParameters.cs" />
     <Compile Include="IExternalCommands\Hydra.cs" />
+    <Compile Include="Modify\CopyTags.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -274,6 +282,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\CopyTagsForm.resx">
+      <DependentUpon>CopyTagsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SimulateForm.resx">
       <DependentUpon>SimulateForm.cs</DependentUpon>
     </EmbeddedResource>
