@@ -125,12 +125,11 @@ namespace SAM.Analytical.Revit.UI
                                         continue;
                                     }
 
-                                    ElementId elementId = aperture.ElementId();
-                                    if (elementId != null && elementId != ElementId.InvalidElementId)
+                                    Aperture aperture_New = new Aperture(aperture_Temp.Guid, aperture, aperture_Temp.Face3D);
+                                    if (aperture_New != null)
                                     {
-                                        apertures_Temp[i].SetValue(ElementParameter.RevitId, Geometry.Revit.Query.IntegerId(document.GetElement(elementId)));
-                                        panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
-                                        panel_Temp.AddAperture(apertures_Temp[i]);
+                                        panel_Temp.RemoveAperture(aperture_Temp.Guid);
+                                        panel_Temp.AddAperture(aperture_New);
                                     }
                                 }
 
