@@ -25,7 +25,7 @@ namespace SAM.Analytical.Revit.UI
 
         public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
         {
-            Modify.CopyWall(externalCommandData?.Application?.ActiveUIDocument);
+            Revit.Modify.CopyWall(externalCommandData?.Application?.ActiveUIDocument);
 
             return Result.Succeeded;
         }

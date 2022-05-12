@@ -68,7 +68,7 @@ namespace SAM.Analytical.Revit.UI
                         continue;
                     }
 
-                    List<Autodesk.Revit.DB.Mechanical.SpaceTag> spaceTags = Core.Revit.Modify.TagSpaces(document, templateNames, tuple.Item1.Id, new ViewType[] { ViewType.FloorPlan });
+                    List<Autodesk.Revit.DB.Mechanical.SpaceTag> spaceTags = Core.Revit.Modify.TagSpaces(document, templateNames, tuple.Item1.Id, new ViewType[] { ViewType.FloorPlan }, false);
 
                 }
 

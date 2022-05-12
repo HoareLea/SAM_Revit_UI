@@ -75,7 +75,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 transaction.Start();
 
-                analyticalModel = Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
+                analyticalModel = Revit.Convert.ToSAM_AnalyticalModel(document, new ConvertSettings(true, true, false));
 
                 transaction.RollBack();
             }
