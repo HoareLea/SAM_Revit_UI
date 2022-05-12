@@ -80,53 +80,15 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            ConvertSettings convertSettings = new ConvertSettings(true, true, true);
+
 
             if(tags.Count != 0)
             {
                 using (Transaction transaction = new Transaction(document, "Import Tags"))
                 {
                     transaction.Start();
-                    using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Importing Tags", string.Empty, tags.Count))
-                    {
-                        foreach (Tag tag in tags)
-                        {
-                            string name = tag?.Name;
-                            if(string.IsNullOrWhiteSpace(name))
-                            {
-                                name = "???";
-                            }
 
-                            simpleProgressForm.Increment(name);
-                            if(tag == null)
-                            {
-                                continue;
-                            }
-
-                            if(tag.Placed(document))
-                            {
-                                continue;
-                            }
-
-                            BuiltInCategory? builtInCategory = tag.BuiltInCategory();
-                            if (builtInCategory == null || !builtInCategory.HasValue)
-                            {
-                                continue;
-                            }
-
-                            if (builtInCategory != BuiltInCategory.OST_MEPSpaceTags)
-                            {
-                                IndependentTag independentTag = Geometry.Revit.Convert.ToRevit(tag, document, convertSettings);
-                            }
-                            else
-                            {
-                                SpaceTag spaceTag = Geometry.Revit.Convert.ToRevit_SpaceTag(tag, document, convertSettings);
-                            }
-
-
-                        }
-                    }
-
+                    Modify.ImportTags(document, tags);
 
                     transaction.Commit();
                 }

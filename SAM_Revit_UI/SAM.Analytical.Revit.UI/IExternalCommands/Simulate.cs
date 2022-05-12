@@ -338,7 +338,7 @@ namespace SAM.Analytical.Revit.UI
 
                         simpleProgressForm.Increment("Coping Parameters");
 
-                        Modify.CopySpatialElementParameters(document, Tool.TAS);
+                        Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
 
                         simpleProgressForm.Increment("Finishing");
 
