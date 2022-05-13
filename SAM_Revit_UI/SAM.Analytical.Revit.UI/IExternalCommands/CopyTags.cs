@@ -19,7 +19,7 @@ namespace SAM.Analytical.Revit.UI
 
         public override string Text => "Copy\nTags";
 
-        public override string ToolTip => "Copy Tags from one set of views to another \n* Arrange tags on one set of view and then copy";
+        public override string ToolTip => "Copy Tags from one set of views to another \n* Arrange tags on one set of view and then copy \n Need to be run for each Tag Type";
 
         public override string AvailabilityClassName => null;
 
