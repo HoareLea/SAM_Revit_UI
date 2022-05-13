@@ -49,7 +49,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // Button_OK
             // 
             this.Button_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_OK.Location = new System.Drawing.Point(414, 163);
+            this.Button_OK.Location = new System.Drawing.Point(478, 163);
             this.Button_OK.Name = "Button_OK";
             this.Button_OK.Size = new System.Drawing.Size(75, 28);
             this.Button_OK.TabIndex = 3;
@@ -61,7 +61,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // 
             this.Button_Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.Button_Cancel.Location = new System.Drawing.Point(495, 163);
+            this.Button_Cancel.Location = new System.Drawing.Point(559, 163);
             this.Button_Cancel.Name = "Button_Cancel";
             this.Button_Cancel.Size = new System.Drawing.Size(75, 28);
             this.Button_Cancel.TabIndex = 2;
@@ -86,8 +86,8 @@ namespace SAM.Analytical.Revit.UI.Forms
             // 
             this.SplitContainer_Main.Panel2.Controls.Add(this.GroupBox_Destination);
             this.SplitContainer_Main.Panel2MinSize = 200;
-            this.SplitContainer_Main.Size = new System.Drawing.Size(558, 145);
-            this.SplitContainer_Main.SplitterDistance = 270;
+            this.SplitContainer_Main.Size = new System.Drawing.Size(622, 145);
+            this.SplitContainer_Main.SplitterDistance = 300;
             this.SplitContainer_Main.TabIndex = 4;
             // 
             // GroupBox_Source
@@ -97,7 +97,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.GroupBox_Source.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupBox_Source.Location = new System.Drawing.Point(0, 0);
             this.GroupBox_Source.Name = "GroupBox_Source";
-            this.GroupBox_Source.Size = new System.Drawing.Size(270, 145);
+            this.GroupBox_Source.Size = new System.Drawing.Size(300, 145);
             this.GroupBox_Source.TabIndex = 1;
             this.GroupBox_Source.TabStop = false;
             this.GroupBox_Source.Text = "Source";
@@ -109,7 +109,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_SourceTagType.Description = "Tag Type";
             this.ComboBoxControl_SourceTagType.Location = new System.Drawing.Point(6, 81);
             this.ComboBoxControl_SourceTagType.Name = "ComboBoxControl_SourceTagType";
-            this.ComboBoxControl_SourceTagType.Size = new System.Drawing.Size(258, 54);
+            this.ComboBoxControl_SourceTagType.Size = new System.Drawing.Size(288, 54);
             this.ComboBoxControl_SourceTagType.TabIndex = 6;
             // 
             // ComboBoxControl_SourceTemplate
@@ -119,7 +119,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_SourceTemplate.Description = "Template Name";
             this.ComboBoxControl_SourceTemplate.Location = new System.Drawing.Point(6, 21);
             this.ComboBoxControl_SourceTemplate.Name = "ComboBoxControl_SourceTemplate";
-            this.ComboBoxControl_SourceTemplate.Size = new System.Drawing.Size(258, 54);
+            this.ComboBoxControl_SourceTemplate.Size = new System.Drawing.Size(288, 54);
             this.ComboBoxControl_SourceTemplate.TabIndex = 5;
             // 
             // GroupBox_Destination
@@ -129,7 +129,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.GroupBox_Destination.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupBox_Destination.Location = new System.Drawing.Point(0, 0);
             this.GroupBox_Destination.Name = "GroupBox_Destination";
-            this.GroupBox_Destination.Size = new System.Drawing.Size(284, 145);
+            this.GroupBox_Destination.Size = new System.Drawing.Size(318, 145);
             this.GroupBox_Destination.TabIndex = 0;
             this.GroupBox_Destination.TabStop = false;
             this.GroupBox_Destination.Text = "Destination";
@@ -141,7 +141,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_DestinationTagType.Description = "Tag Type";
             this.ComboBoxControl_DestinationTagType.Location = new System.Drawing.Point(6, 81);
             this.ComboBoxControl_DestinationTagType.Name = "ComboBoxControl_DestinationTagType";
-            this.ComboBoxControl_DestinationTagType.Size = new System.Drawing.Size(272, 54);
+            this.ComboBoxControl_DestinationTagType.Size = new System.Drawing.Size(306, 54);
             this.ComboBoxControl_DestinationTagType.TabIndex = 8;
             // 
             // ComboBoxControl_DestinationTemplate
@@ -151,7 +151,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_DestinationTemplate.Description = "Template Name";
             this.ComboBoxControl_DestinationTemplate.Location = new System.Drawing.Point(6, 21);
             this.ComboBoxControl_DestinationTemplate.Name = "ComboBoxControl_DestinationTemplate";
-            this.ComboBoxControl_DestinationTemplate.Size = new System.Drawing.Size(272, 54);
+            this.ComboBoxControl_DestinationTemplate.Size = new System.Drawing.Size(306, 54);
             this.ComboBoxControl_DestinationTemplate.TabIndex = 7;
             // 
             // CopyTagsForm
@@ -159,7 +159,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.AcceptButton = this.Button_OK;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this.Button_Cancel;
-            this.ClientSize = new System.Drawing.Size(582, 203);
+            this.ClientSize = new System.Drawing.Size(646, 203);
             this.Controls.Add(this.SplitContainer_Main);
             this.Controls.Add(this.Button_OK);
             this.Controls.Add(this.Button_Cancel);

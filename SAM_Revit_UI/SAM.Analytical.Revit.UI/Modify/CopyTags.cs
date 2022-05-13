@@ -160,6 +160,7 @@ namespace SAM.Analytical.Revit.UI
                             for (int i = 0; i < tuple.Item2.Count; i++)
                             {
                                 Tag tag = new Tag(tagType, viewId, tuple.Item2[i].Location, tuple.Item2[i].ReferenceId);
+                                Core.Modify.CopyParameterSets(tuple.Item2[i], tag);
 
                                 BuiltInCategory? builtInCategory = tag.BuiltInCategory();
                                 if (builtInCategory == null || !builtInCategory.HasValue)

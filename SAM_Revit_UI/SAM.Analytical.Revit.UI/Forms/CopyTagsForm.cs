@@ -39,13 +39,13 @@ namespace SAM.Analytical.Revit.UI.Forms
             ComboBoxControl_SourceTagType.SelectedIndexChanged += new EventHandler(ComboBoxControl_SourceTagType_SelectedIndexChanged);
 
             ComboBoxControl_SourceTemplate.AddRange(views, view => view.Name);
-            if(!ComboBoxControl_SourceTemplate.SetSelectedItem(UIDocument.ActiveView))
+            if (!ComboBoxControl_SourceTemplate.SetSelectedItem(views.Find(x => x.Id == UIDocument.ActiveView?.ViewTemplateId)))
             {
                 ComboBoxControl_SourceTemplate.SetSelectedItem(views[0]);
             }
 
             ComboBoxControl_DestinationTemplate.AddRange(views, view => view.Name);
-            ComboBoxControl_SourceTemplate.SetSelectedItem(views[0]);
+            ComboBoxControl_DestinationTemplate.SetSelectedItem(views[0]);
         }
 
         public Autodesk.Revit.DB.View SourceViewTemplate
@@ -109,10 +109,15 @@ namespace SAM.Analytical.Revit.UI.Forms
 
             List<Autodesk.Revit.DB.View> views = new FilteredElementCollector(document).OfClass(view.GetType()).Cast<Autodesk.Revit.DB.View>().ToList();
             views.RemoveAll(x => x == null || x.IsTemplate || x.ViewType != view.ViewType || x.ViewTemplateId != view.Id);
+            if(views == null || views.Count == 0)
+            {
+                return;
+            }
 
-            List<ElementFilter> elementFilters = views.ConvertAll(x => new ElementOwnerViewFilter(x.Id) as ElementFilter);
-
-            ElementFilter elementFilter = new LogicalAndFilter(new LogicalOrFilter(new ElementCategoryFilter(BuiltInCategory.OST_MEPSpaceTags), new ElementClassFilter(typeof(IndependentTag))), new LogicalOrFilter(elementFilters));
+            ElementFilter elementFilter = new LogicalAndFilter(
+                new LogicalOrFilter(new ElementCategoryFilter(BuiltInCategory.OST_MEPSpaceTags), new ElementClassFilter(typeof(IndependentTag))),
+                new LogicalOrFilter(views.ConvertAll(x => new ElementOwnerViewFilter(x.Id) as ElementFilter))
+                );
 
             List<Element> elements_Tag = new FilteredElementCollector(document).WherePasses(elementFilter).ToList();
             if(elements_Tag == null || elements_Tag.Count == 0)
@@ -137,7 +142,7 @@ namespace SAM.Analytical.Revit.UI.Forms
                 dictionary[elementId] = document.GetElement(elementId) as FamilySymbol;
             }
 
-            ComboBoxControl_SourceTagType.AddRange(dictionary.Values, x => x.Name);
+            ComboBoxControl_SourceTagType.AddRange(dictionary.Values, x => Core.Revit.Query.FullName(x));
             if(!ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol))
             {
                 familySymbol = dictionary.Values.ToList().Find(x => x.Category.Id.IntegerValue == (int)BuiltInCategory.OST_MEPSpaceTags);
@@ -168,21 +173,54 @@ namespace SAM.Analytical.Revit.UI.Forms
                 return;
             }
 
-            List<FamilySymbol> FamilySymbols = ComboBoxControl_SourceTagType.GetItems<FamilySymbol>();
-            FamilySymbols.RemoveAll(x => x.Category.Id != familySymbol_Source.Category.Id);
+            List<FamilySymbol> familySymbols = ComboBoxControl_SourceTagType.GetItems<FamilySymbol>();
+            familySymbols.RemoveAll(x => x.Category.Id != familySymbol_Source.Category.Id);
 
-            if (FamilySymbols == null || FamilySymbols.Count == 0)
+            if (familySymbols == null || familySymbols.Count == 0)
             {
                 return;
             }
 
-            ComboBoxControl_DestinationTagType.AddRange(FamilySymbols, x => x.Name);
+            Dictionary<ElementId, FamilySymbol> dictionary = new Dictionary<ElementId, FamilySymbol>();
+            foreach(FamilySymbol familySymbol in familySymbols)
+            {
+                IEnumerable<ElementId> elementIds = familySymbol?.Family?.GetFamilySymbolIds();
+                if(elementIds == null || elementIds.Count() == 0)
+                {
+                    continue;
+                }
+
+                foreach(ElementId elementId in elementIds)
+                {
+                    if(elementId == null || dictionary.ContainsKey(elementId) || elementId == ElementId.InvalidElementId)
+                    {
+                        continue;
+                    }
+
+                    FamilySymbol familySymbol_Temp = document.GetElement(elementId) as FamilySymbol;
+                    if(familySymbol_Temp == null)
+                    {
+                        continue;
+                    }
+
+                    dictionary[familySymbol_Temp.Id] = familySymbol_Temp;
+                }
+            }
+
+            if(dictionary == null || dictionary.Count == 0)
+            {
+                return;
+            }
+
+            ComboBoxControl_DestinationTagType.AddRange(dictionary.Values, x => Core.Revit.Query.FullName(x));
+            
+            dictionary.TryGetValue(familySymbol_Destination == null ? ElementId.InvalidElementId : familySymbol_Destination.Id, out familySymbol_Destination);
             if (!ComboBoxControl_DestinationTagType.SetSelectedItem(familySymbol_Destination))
             {
-                familySymbol_Destination = familySymbol_Source;
+                dictionary.TryGetValue(familySymbol_Source == null ? ElementId.InvalidElementId : familySymbol_Source.Id, out familySymbol_Destination);
                 if (!ComboBoxControl_DestinationTagType.SetSelectedItem(familySymbol_Destination))
                 {
-                    familySymbol_Destination = FamilySymbols[0];
+                    familySymbol_Destination = dictionary.Values.FirstOrDefault();
                     if (familySymbol_Destination != null)
                     {
                         ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol_Destination);
