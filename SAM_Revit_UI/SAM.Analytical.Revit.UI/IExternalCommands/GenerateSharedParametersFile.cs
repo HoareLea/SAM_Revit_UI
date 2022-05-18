@@ -165,7 +165,7 @@ namespace SAM.Analytical.Revit.UI
 
             });
 
-            Core.Excel.Modify.Update(path_Excel, "Live", func);
+            Core.Excel.Modify.Edit(path_Excel, "Live", func);
 
             return Result.Succeeded;
         }
