@@ -96,6 +96,14 @@ namespace SAM.Analytical.Revit.UI.Forms
             }
         }
 
+        public bool RoomDataSheets
+        {
+            get
+            {
+                return CheckBox_PrintRoomDataSheets.Checked;
+            }
+        }
+
         public SolarCalculationMethod SolarCalculationMethod
         {
             get

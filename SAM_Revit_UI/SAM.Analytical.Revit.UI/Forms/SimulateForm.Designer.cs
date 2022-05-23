@@ -33,12 +33,13 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Button_OK = new System.Windows.Forms.Button();
             this.ComboBoxControl_GeometryCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
             this.SimulateControl_Main = new SAM.Analytical.UI.Controls.SimulateControl();
+            this.CheckBox_PrintRoomDataSheets = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // Button_Cancel
             // 
             this.Button_Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_Cancel.Location = new System.Drawing.Point(413, 432);
+            this.Button_Cancel.Location = new System.Drawing.Point(413, 498);
             this.Button_Cancel.Name = "Button_Cancel";
             this.Button_Cancel.Size = new System.Drawing.Size(75, 28);
             this.Button_Cancel.TabIndex = 0;
@@ -49,7 +50,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             // Button_OK
             // 
             this.Button_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Button_OK.Location = new System.Drawing.Point(332, 432);
+            this.Button_OK.Location = new System.Drawing.Point(332, 498);
             this.Button_OK.Name = "Button_OK";
             this.Button_OK.Size = new System.Drawing.Size(75, 28);
             this.Button_OK.TabIndex = 1;
@@ -62,7 +63,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.ComboBoxControl_GeometryCalculationMethod.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ComboBoxControl_GeometryCalculationMethod.Description = "Geometry Calculation Method:";
-            this.ComboBoxControl_GeometryCalculationMethod.Location = new System.Drawing.Point(12, 349);
+            this.ComboBoxControl_GeometryCalculationMethod.Location = new System.Drawing.Point(12, 403);
             this.ComboBoxControl_GeometryCalculationMethod.Name = "ComboBoxControl_GeometryCalculationMethod";
             this.ComboBoxControl_GeometryCalculationMethod.Size = new System.Drawing.Size(470, 55);
             this.ComboBoxControl_GeometryCalculationMethod.TabIndex = 0;
@@ -80,10 +81,21 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.SimulateControl_Main.UpdateConstructionLayersByPanelType = true;
             this.SimulateControl_Main.WeatherData = null;
             // 
+            // CheckBox_PrintRoomDataSheets
+            // 
+            this.CheckBox_PrintRoomDataSheets.AutoSize = true;
+            this.CheckBox_PrintRoomDataSheets.Location = new System.Drawing.Point(13, 351);
+            this.CheckBox_PrintRoomDataSheets.Name = "CheckBox_PrintRoomDataSheets";
+            this.CheckBox_PrintRoomDataSheets.Size = new System.Drawing.Size(225, 21);
+            this.CheckBox_PrintRoomDataSheets.TabIndex = 3;
+            this.CheckBox_PrintRoomDataSheets.Text = "Print Room Data Sheets (RDS)";
+            this.CheckBox_PrintRoomDataSheets.UseVisualStyleBackColor = true;
+            // 
             // SimulateForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(500, 472);
+            this.ClientSize = new System.Drawing.Size(500, 538);
+            this.Controls.Add(this.CheckBox_PrintRoomDataSheets);
             this.Controls.Add(this.Button_OK);
             this.Controls.Add(this.Button_Cancel);
             this.Controls.Add(this.ComboBoxControl_GeometryCalculationMethod);
@@ -96,6 +108,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Text = "Simulate";
             this.Load += new System.EventHandler(this.SimulateForm_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -105,5 +118,6 @@ namespace SAM.Analytical.Revit.UI.Forms
         private System.Windows.Forms.Button Button_OK;
         private Core.Windows.ComboBoxControl ComboBoxControl_GeometryCalculationMethod;
         private Analytical.UI.Controls.SimulateControl SimulateControl_Main;
+        private System.Windows.Forms.CheckBox CheckBox_PrintRoomDataSheets;
     }
 }

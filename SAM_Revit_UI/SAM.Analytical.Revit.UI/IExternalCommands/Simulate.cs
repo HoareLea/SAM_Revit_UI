@@ -78,6 +78,7 @@ namespace SAM.Analytical.Revit.UI
             SolarCalculationMethod solarCalculationMethod = SolarCalculationMethod.None;
             GeometryCalculationMethod geometryCalculationMethod = GeometryCalculationMethod.SAM;
             bool updateConstructionLayersByPanelType = false;
+            bool printRoomDataSheets = false;
 
             using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
             {
@@ -96,6 +97,7 @@ namespace SAM.Analytical.Revit.UI
                 solarCalculationMethod = simulateForm.SolarCalculationMethod;
                 geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
                 updateConstructionLayersByPanelType = simulateForm.UpdateConstructionLayersByPanelType;
+                printRoomDataSheets = simulateForm.RoomDataSheets;
             }
 
             Stopwatch stopwatch = new Stopwatch();
@@ -125,11 +127,11 @@ namespace SAM.Analytical.Revit.UI
                 }
 
                 IEnumerable<Core.IMaterial> materials = Analytical.Query.Materials(analyticalModel.AdjacencyCluster, Analytical.Query.DefaultMaterialLibrary());
-                if(materials != null)
+                if (materials != null)
                 {
-                    foreach(Core.IMaterial material in materials)
+                    foreach (Core.IMaterial material in materials)
                     {
-                        if(analyticalModel.HasMaterial(material))
+                        if (analyticalModel.HasMaterial(material))
                         {
                             continue;
                         }
@@ -150,7 +152,7 @@ namespace SAM.Analytical.Revit.UI
                 //Run Solar Calculation for cooling load
 
                 simpleProgressForm.Increment("Solar Calculations");
-                if(solarCalculationMethod != SolarCalculationMethod.None)
+                if (solarCalculationMethod != SolarCalculationMethod.None)
                 {
                     SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
                 }
@@ -225,12 +227,11 @@ namespace SAM.Analytical.Revit.UI
                 }
             }
 
-            if (adjacencyCluster != null && results != null && results.Count != 0)
+            using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Inserting Results", string.Empty, results.Count + 5))
             {
-                using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Inserting Results", string.Empty, results.Count + 3))
+                simpleProgressForm.Increment("Processing Revit");
+                if (adjacencyCluster != null && results != null && results.Count != 0)
                 {
-                    simpleProgressForm.Increment("Initialization");
-
                     ConvertSettings convertSettings = new ConvertSettings(false, true, false);
                     convertSettings.AddParameter("AdjacencyCluster", adjacencyCluster);
                     convertSettings.AddParameter("AnalyticalModel", analyticalModel);
@@ -248,14 +249,14 @@ namespace SAM.Analytical.Revit.UI
 
                             ElementId elementId = space.ElementId();
 
-                            if(elementId != null && elementId != ElementId.InvalidElementId)
+                            if (elementId != null && elementId != ElementId.InvalidElementId)
                             {
                                 if (space.TryGetValue(SpaceParameter.Occupancy, out double occupancy) && occupancy == 0)
                                 {
                                     space.RemoveValue(SpaceParameter.Occupancy);
                                 }
 
-                                if(space.InternalCondition != null)
+                                if (space.InternalCondition != null)
                                 {
                                     InternalCondition internalCondition = space.InternalCondition;
                                     if (internalCondition.TryGetValue(InternalConditionParameter.AreaPerPerson, out double areaPerPerson) && areaPerPerson == 0)
@@ -290,7 +291,7 @@ namespace SAM.Analytical.Revit.UI
                                 Panel panel = (Panel)sAMObject;
 
                                 ElementId elementId = null;
-                                if(dictionary != null)
+                                if (dictionary != null)
                                 {
                                     if (!dictionary.TryGetValue(panel.Guid, out elementId))
                                     {
@@ -322,7 +323,7 @@ namespace SAM.Analytical.Revit.UI
                                             }
                                         }
 
-                                        if(elementId == null)
+                                        if (elementId == null)
                                         {
                                             elementId = aperture.ElementId();
                                         }
@@ -340,21 +341,35 @@ namespace SAM.Analytical.Revit.UI
 
                         Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
 
-                        simpleProgressForm.Increment("Finishing");
+                        simpleProgressForm.Increment("Finising Transaction");
 
                         transaction.Commit();
                     }
                 }
+
+                string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
+
+                simpleProgressForm.Increment("Saving SAM Analytical Model");
+
+                Core.Convert.ToFile(analyticalModel, path_SAM);
+
+                simpleProgressForm.Increment("Printing Room Data Sheets");
+                if (printRoomDataSheets && analyticalModel != null)
+                {
+                    string printDirectory = System.IO.Path.Combine(outputDirectory, "Print");
+                    if (!System.IO.Directory.Exists(printDirectory))
+                    {
+                        System.IO.Directory.CreateDirectory(printDirectory);
+                    }
+
+                    Analytical.UI.Modify.PrintRoomDataSheets(analyticalModel, printDirectory);
+                }
             }
-
-            string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
-
-            Core.Convert.ToFile(analyticalModel, path_SAM);
 
             stopwatch.Stop();
 
             string hoursString = stopwatch.Elapsed.Hours.ToString();
-            while(hoursString.Length < 2)
+            while (hoursString.Length < 2)
             {
                 hoursString = "0" + hoursString;
             }
