@@ -356,13 +356,12 @@ namespace SAM.Analytical.Revit.UI
                 simpleProgressForm.Increment("Printing Room Data Sheets");
                 if (printRoomDataSheets && analyticalModel != null)
                 {
-                    string printDirectory = System.IO.Path.Combine(outputDirectory, "Print");
-                    if (!System.IO.Directory.Exists(printDirectory))
+                    if (!System.IO.Directory.Exists(outputDirectory))
                     {
-                        System.IO.Directory.CreateDirectory(printDirectory);
+                        System.IO.Directory.CreateDirectory(outputDirectory);
                     }
 
-                    Analytical.UI.Modify.PrintRoomDataSheets(analyticalModel, printDirectory);
+                    Analytical.UI.Modify.PrintRoomDataSheets(analyticalModel, outputDirectory);
                 }
             }
 
