@@ -85,7 +85,7 @@ namespace SAM.Analytical.Revit.UI
                 }
 
                 List<string> names = new List<string>();
-                using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Creating Shared Parameters", "Parameter", objects.GetLength(0)))
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Creating Shared Parameters", objects.GetLength(0)))
                 {
                     for (int i = 5; i <= objects.GetLength(0); i++)
                     {
@@ -103,7 +103,7 @@ namespace SAM.Analytical.Revit.UI
                             name = "???";
                         }
 
-                        simpleProgressForm.Increment(name);
+                        progressForm.Update(name);
                     }
                 }
 

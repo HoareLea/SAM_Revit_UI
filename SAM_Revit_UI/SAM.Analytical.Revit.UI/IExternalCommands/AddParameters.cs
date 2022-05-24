@@ -90,7 +90,7 @@ namespace SAM.Analytical.Revit.UI
                     BindingMap bindingMap = document.ParameterBindings;
                     List<string> names = new List<string>();
 
-                    using (SimpleProgressForm progressForm = new SimpleProgressForm("Creating Shared Parameters", "Parameter", objects.GetLength(0)))
+                    using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Creating Shared Parameters", objects.GetLength(0)))
                     {
                         for (int i = 1; i <= objects.GetLength(0); i++)
                         {
@@ -98,9 +98,9 @@ namespace SAM.Analytical.Revit.UI
                             {
                                 string name = objects[i, index_Name] as string;
                                 if (string.IsNullOrEmpty(name))
-                                    progressForm.Increment("???");
+                                    progressForm.Update("???");
                                 else
-                                    progressForm.Increment(name);
+                                    progressForm.Update(name);
 
                                 if(!names_Selected.Contains(name))
                                 {
@@ -188,7 +188,7 @@ namespace SAM.Analytical.Revit.UI
                             }
                             else
                             {
-                                progressForm.Increment("???");
+                                progressForm.Update("???");
                             }
                         }
                     }

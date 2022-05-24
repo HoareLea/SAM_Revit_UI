@@ -115,9 +115,9 @@ namespace SAM.Analytical.Revit.UI
             string path_TBD = System.IO.Path.Combine(outputDirectory, projectName + ".tbd");
 
             Dictionary<Guid, ElementId> dictionary = null;
-            using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Preparing Model", string.Empty, 6))
+            using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Preparing Model", 6))
             {
-                simpleProgressForm.Increment("Converting Model");
+                progressForm.Update("Converting Model");
                 analyticalModel = Convert.ToSAM(document, geometryCalculationMethod, out dictionary);
 
                 if (analyticalModel == null)
@@ -151,7 +151,7 @@ namespace SAM.Analytical.Revit.UI
 
                 //Run Solar Calculation for cooling load
 
-                simpleProgressForm.Increment("Solar Calculations");
+                progressForm.Update("Solar Calculations");
                 if (solarCalculationMethod != SolarCalculationMethod.None)
                 {
                     SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
@@ -161,7 +161,7 @@ namespace SAM.Analytical.Revit.UI
                 {
                     TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
 
-                    simpleProgressForm.Increment("Updating WeatherData");
+                    progressForm.Update("Updating WeatherData");
                     Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData, analyticalModel == null ? 0 : analyticalModel.AdjacencyCluster.BuildingHeight());
 
                     TBD.Calendar calendar = tBDDocument.Building.GetCalendar();
@@ -179,13 +179,13 @@ namespace SAM.Analytical.Revit.UI
                         dayType.name = "CDD";
                     }
 
-                    simpleProgressForm.Increment("Converting to TBD");
+                    progressForm.Update("Converting to TBD");
                     Tas.Convert.ToTBD(analyticalModel, tBDDocument);
 
-                    simpleProgressForm.Increment("Updating Zones");
+                    progressForm.Update("Updating Zones");
                     Tas.Modify.UpdateZones(tBDDocument.Building, analyticalModel, true);
 
-                    simpleProgressForm.Increment("Updating Shading");
+                    progressForm.Update("Updating Shading");
                     simulate = Tas.Modify.UpdateShading(tBDDocument, analyticalModel);
 
                     sAMTBDDocument.Save();
@@ -227,9 +227,9 @@ namespace SAM.Analytical.Revit.UI
                 }
             }
 
-            using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Inserting Results", string.Empty, results.Count + 5))
+            using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Inserting Results", results.Count + 5))
             {
-                simpleProgressForm.Increment("Processing Revit");
+                progressForm.Update("Processing Revit");
                 if (adjacencyCluster != null && results != null && results.Count != 0)
                 {
                     ConvertSettings convertSettings = new ConvertSettings(false, true, false);
@@ -245,7 +245,7 @@ namespace SAM.Analytical.Revit.UI
 
                         foreach (Space space in results.FindAll(x => x is Space))
                         {
-                            simpleProgressForm.Increment(string.IsNullOrWhiteSpace(space?.Name) ? "???" : space.Name);
+                            progressForm.Update(string.IsNullOrWhiteSpace(space?.Name) ? "???" : space.Name);
 
                             ElementId elementId = space.ElementId();
 
@@ -272,7 +272,7 @@ namespace SAM.Analytical.Revit.UI
 
                         foreach (Core.ISAMObject sAMObject in results.FindAll(x => !(x is Space)))
                         {
-                            simpleProgressForm.Increment(sAMObject?.Name == null ? "???" : sAMObject.Name);
+                            progressForm.Update(sAMObject?.Name == null ? "???" : sAMObject.Name);
 
                             if (sAMObject is SpaceSimulationResult)
                             {
@@ -337,11 +337,11 @@ namespace SAM.Analytical.Revit.UI
                             }
                         }
 
-                        simpleProgressForm.Increment("Coping Parameters");
+                        progressForm.Update("Coping Parameters");
 
                         Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
 
-                        simpleProgressForm.Increment("Finising Transaction");
+                        progressForm.Update("Finising Transaction");
 
                         transaction.Commit();
                     }
@@ -349,11 +349,11 @@ namespace SAM.Analytical.Revit.UI
 
                 string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
 
-                simpleProgressForm.Increment("Saving SAM Analytical Model");
+                progressForm.Update("Saving SAM Analytical Model");
 
                 Core.Convert.ToFile(analyticalModel, path_SAM);
 
-                simpleProgressForm.Increment("Printing Room Data Sheets");
+                progressForm.Update("Printing Room Data Sheets");
                 if (printRoomDataSheets && analyticalModel != null)
                 {
                     if (!System.IO.Directory.Exists(outputDirectory))

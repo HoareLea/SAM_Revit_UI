@@ -92,7 +92,7 @@ namespace SAM.Analytical.Revit.UI
 
             using (Transaction transaction = new Transaction(document, "Add Window and Door Tags"))
             {
-                using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Add Window and Door Tags", string.Empty, tuples.Count + 1))
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Add Window and Door Tags", tuples.Count + 1))
                 {
                     transaction.Start();
 
@@ -100,16 +100,16 @@ namespace SAM.Analytical.Revit.UI
                     {
                         if (tuple.Item1 == null || tuple.Item2 == null || tuple.Item2.Count == 0)
                         {
-                            simpleProgressForm.Increment("???");
+                            progressForm.Update("???");
                             continue;
                         }
 
-                        simpleProgressForm.Increment((document.GetElement(tuple.Item1) as ElementType)?.FamilyName);
+                        progressForm.Update((document.GetElement(tuple.Item1) as ElementType)?.FamilyName);
 
                         List<IndependentTag> independentTags = Core.Revit.Modify.TagElements(document, templateNames, tuple.Item1, tuple.Item2.ConvertAll(x => x.Id), false, TagOrientation.Horizontal, new ViewType[] { ViewType.FloorPlan }, false);
                     }
 
-                    simpleProgressForm.Increment("Finishing");
+                    progressForm.Update("Finishing");
 
                     transaction.Commit();
                 }

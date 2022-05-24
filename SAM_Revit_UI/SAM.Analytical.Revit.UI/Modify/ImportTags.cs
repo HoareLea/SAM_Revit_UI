@@ -20,7 +20,7 @@ namespace SAM.Analytical.Revit.UI
 
             ConvertSettings convertSettings = new ConvertSettings(true, true, true);
 
-            using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Importing Tags", string.Empty, tags.Count()))
+            using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Importing Tags", tags.Count()))
             {
                 foreach (Tag tag in tags)
                 {
@@ -30,7 +30,7 @@ namespace SAM.Analytical.Revit.UI
                         name = "???";
                     }
 
-                    simpleProgressForm.Increment(name);
+                    progressForm.Update(name);
                     if (tag == null)
                     {
                         continue;

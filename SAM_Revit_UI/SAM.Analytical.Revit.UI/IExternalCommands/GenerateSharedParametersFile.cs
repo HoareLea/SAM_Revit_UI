@@ -104,21 +104,21 @@ namespace SAM.Analytical.Revit.UI
                     sharedParameterFileWrapper.Open(path_SharedParametersFile);
 
                     List<string> names = new List<string>();
-                    using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Creating Shared Parameters", "Parameter", objects.GetLength(0)))
+                    using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Creating Shared Parameters", objects.GetLength(0)))
                     {
                         for (int i = 1; i <= objects.GetLength(0); i++)
                         {
                             if (string.IsNullOrEmpty(objects[i, index_Name] as string) || string.IsNullOrEmpty(objects[i, index_ParameterType] as string))
                             {
-                                simpleProgressForm.Increment("???");
+                                progressForm.Update("???");
                                 continue;
                             }
 
                             string name = objects[i, index_Name] as string;
                             if (string.IsNullOrEmpty(name))
-                                simpleProgressForm.Increment("???");
+                                progressForm.Update("???");
                             else
-                                simpleProgressForm.Increment(name);
+                                progressForm.Update(name);
 
                             string parameterTypeString = objects[i, index_ParameterType] as string;
                             parameterTypeString = parameterTypeString.Replace(" ", string.Empty);

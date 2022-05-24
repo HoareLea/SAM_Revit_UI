@@ -94,9 +94,9 @@ namespace SAM.Analytical.Revit.UI
 
                 List<Element> elements = new List<Element>();
 
-                using (Core.Windows.SimpleProgressForm simpleProgressForm = new Core.Windows.SimpleProgressForm("Lad Analytical Model", string.Empty, 5))
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Lad Analytical Model", 5))
                 {
-                    simpleProgressForm.Increment("Creating Levels");
+                    progressForm.Update("Creating Levels");
 
                     foreach (Architectural.Level level in levels)
                     {
@@ -107,7 +107,7 @@ namespace SAM.Analytical.Revit.UI
                         }
                     }
 
-                    simpleProgressForm.Increment("Creating Model");
+                    progressForm.Update("Creating Model");
 
                     List<Element> elements_AnalyticalModel = Revit.Convert.ToRevit(analyticalModel, document, convertSettings);
                     if (elements_AnalyticalModel != null)
@@ -115,17 +115,17 @@ namespace SAM.Analytical.Revit.UI
                         elements.AddRange(elements_AnalyticalModel);
                     }
 
-                    simpleProgressForm.Increment("Importing Tags");
+                    progressForm.Update("Importing Tags");
                     List<Tag> tags = analyticalModel.AdjacencyCluster.GetObjects<Tag>();
                     if (tags != null && tags.Count != 0)
                     {
                         Modify.ImportTags(document, tags);
                     }
 
-                    simpleProgressForm.Increment("Coping Parameters");
+                    progressForm.Update("Coping Parameters");
                     Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
 
-                    simpleProgressForm.Increment("Finishing");
+                    progressForm.Update("Finishing");
                 }
 
                 transaction.Commit();

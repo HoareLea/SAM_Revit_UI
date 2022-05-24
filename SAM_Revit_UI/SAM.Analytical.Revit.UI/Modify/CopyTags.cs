@@ -148,11 +148,11 @@ namespace SAM.Analytical.Revit.UI
             {
                 transaction.Start();
 
-                using (SimpleProgressForm simpleProgressForm = new SimpleProgressForm("Coping Tags", string.Empty, tuples.Count))
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Coping Tags", tuples.Count))
                 {
                     foreach (Tuple<View, List<Tag>, List<View>> tuple in tuples)
                     {
-                        simpleProgressForm.Increment(tuple.Item1.Name);
+                        progressForm.Update(tuple.Item1.Name);
                         foreach (View view in tuple.Item3)
                         {
                             IntegerId viewId = Geometry.Revit.Query.IntegerId(view);
