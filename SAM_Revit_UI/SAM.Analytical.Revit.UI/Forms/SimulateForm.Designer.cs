@@ -33,7 +33,6 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Button_OK = new System.Windows.Forms.Button();
             this.ComboBoxControl_GeometryCalculationMethod = new SAM.Core.Windows.ComboBoxControl();
             this.SimulateControl_Main = new SAM.Analytical.UI.Controls.SimulateControl();
-            this.CheckBox_PrintRoomDataSheets = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // Button_Cancel
@@ -73,29 +72,17 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.SimulateControl_Main.Location = new System.Drawing.Point(12, 12);
             this.SimulateControl_Main.Name = "SimulateControl_Main";
             this.SimulateControl_Main.OutputDirectory = "";
+            this.SimulateControl_Main.RoomDataSheets = false;
             this.SimulateControl_Main.ProjectName = "";
-            this.SimulateControl_Main.Size = new System.Drawing.Size(470, 331);
-            this.SimulateControl_Main.SolarCalculationMethod = SAM.Analytical.UI.SolarCalculationMethod.SAM;
+            this.SimulateControl_Main.Size = new System.Drawing.Size(470, 385);
             this.SimulateControl_Main.TabIndex = 2;
             this.SimulateControl_Main.UnmetHours = false;
             this.SimulateControl_Main.UpdateConstructionLayersByPanelType = true;
-            this.SimulateControl_Main.WeatherData = null;
-            // 
-            // CheckBox_PrintRoomDataSheets
-            // 
-            this.CheckBox_PrintRoomDataSheets.AutoSize = true;
-            this.CheckBox_PrintRoomDataSheets.Location = new System.Drawing.Point(13, 351);
-            this.CheckBox_PrintRoomDataSheets.Name = "CheckBox_PrintRoomDataSheets";
-            this.CheckBox_PrintRoomDataSheets.Size = new System.Drawing.Size(225, 21);
-            this.CheckBox_PrintRoomDataSheets.TabIndex = 3;
-            this.CheckBox_PrintRoomDataSheets.Text = "Print Room Data Sheets (RDS)";
-            this.CheckBox_PrintRoomDataSheets.UseVisualStyleBackColor = true;
             // 
             // SimulateForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(500, 538);
-            this.Controls.Add(this.CheckBox_PrintRoomDataSheets);
             this.Controls.Add(this.Button_OK);
             this.Controls.Add(this.Button_Cancel);
             this.Controls.Add(this.ComboBoxControl_GeometryCalculationMethod);
@@ -108,7 +95,6 @@ namespace SAM.Analytical.Revit.UI.Forms
             this.Text = "Simulate";
             this.Load += new System.EventHandler(this.SimulateForm_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -118,6 +104,5 @@ namespace SAM.Analytical.Revit.UI.Forms
         private System.Windows.Forms.Button Button_OK;
         private Core.Windows.ComboBoxControl ComboBoxControl_GeometryCalculationMethod;
         private Analytical.UI.Controls.SimulateControl SimulateControl_Main;
-        private System.Windows.Forms.CheckBox CheckBox_PrintRoomDataSheets;
     }
 }

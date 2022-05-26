@@ -100,7 +100,7 @@ namespace SAM.Analytical.Revit.UI.Forms
         {
             get
             {
-                return CheckBox_PrintRoomDataSheets.Checked;
+                return SimulateControl_Main.RoomDataSheets;
             }
         }
 
