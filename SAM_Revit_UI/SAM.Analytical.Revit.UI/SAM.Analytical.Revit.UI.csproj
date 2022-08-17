@@ -388,6 +388,6 @@ Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.
 Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
 
 copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
-copy "$(TargetDir)*.exe" "%25SAM_DIR%25"</PostBuildEvent>
+::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"</PostBuildEvent>
   </PropertyGroup>
 </Project>
