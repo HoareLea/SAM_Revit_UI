@@ -154,7 +154,7 @@ namespace SAM.Analytical.Revit.UI
                 progressForm.Update("Solar Calculations");
                 if (solarCalculationMethod != SolarCalculationMethod.None)
                 {
-                    SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
+                    SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), false, Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
                 }
 
                 using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
