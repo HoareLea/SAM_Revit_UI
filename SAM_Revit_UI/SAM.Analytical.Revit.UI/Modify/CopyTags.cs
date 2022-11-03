@@ -74,7 +74,7 @@ namespace SAM.Analytical.Revit.UI
                 return null;
             }
 
-            List<Tuple<View, List<Tag>, List<View>>> tuples = new List<Tuple<View, List<Tag>, List<View>>>();
+            List<Tuple<View, List<Geometry.Revit.Tag>, List<View>>> tuples = new List<Tuple<View, List<Geometry.Revit.Tag>, List<View>>>();
             foreach (View view_Source_Temp in views_Source)
             {
                 Level level_Source = view_Source_Temp?.GenLevel;
@@ -110,10 +110,10 @@ namespace SAM.Analytical.Revit.UI
                     continue;
                 }
 
-                List<Tag> tags = new List<Tag>();
+                List<Geometry.Revit.Tag> tags = new List<Geometry.Revit.Tag>();
                 foreach (Element element in elements)
                 {
-                    Tag tag = null;
+                    Geometry.Revit.Tag tag = null;
                     if (element is SpaceTag)
                     {
                         tag = Geometry.Revit.Convert.ToSAM((SpaceTag)element, convertSettings);
@@ -133,7 +133,7 @@ namespace SAM.Analytical.Revit.UI
 
                 if(tags != null && tags.Count != 0)
                 {
-                    tuples.Add(new Tuple<View, List<Tag>, List<View>>(view_Source_Temp, tags, views_Destination_Temp));
+                    tuples.Add(new Tuple<View, List<Geometry.Revit.Tag>, List<View>>(view_Source_Temp, tags, views_Destination_Temp));
                 }
 
             }
@@ -150,7 +150,7 @@ namespace SAM.Analytical.Revit.UI
 
                 using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Coping Tags", tuples.Count))
                 {
-                    foreach (Tuple<View, List<Tag>, List<View>> tuple in tuples)
+                    foreach (Tuple<View, List<Geometry.Revit.Tag>, List<View>> tuple in tuples)
                     {
                         progressForm.Update(tuple.Item1.Name);
                         foreach (View view in tuple.Item3)
@@ -159,7 +159,7 @@ namespace SAM.Analytical.Revit.UI
 
                             for (int i = 0; i < tuple.Item2.Count; i++)
                             {
-                                Tag tag = new Tag(tagType, viewId, tuple.Item2[i].Location, tuple.Item2[i].Elbow, tuple.Item2[i].End,tuple.Item2[i].ReferenceId);
+                                Geometry.Revit.Tag tag = new Geometry.Revit.Tag(tagType, viewId, tuple.Item2[i].Location, tuple.Item2[i].Elbow, tuple.Item2[i].End,tuple.Item2[i].ReferenceId);
                                 Core.Modify.CopyParameterSets(tuple.Item2[i], tag);
 
                                 if(tag.Placed(document))
