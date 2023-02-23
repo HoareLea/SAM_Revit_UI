@@ -122,15 +122,26 @@ namespace SAM.Analytical.Revit.UI
 
                             string parameterTypeString = objects[i, index_ParameterType] as string;
                             parameterTypeString = parameterTypeString.Replace(" ", string.Empty);
-                            ParameterType parameterType = ParameterType.Invalid;
-                            if (Enum.TryParse(parameterTypeString, out parameterType))
+
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
+                                ParameterType parameterType = ParameterType.Invalid;
+                                if (Enum.TryParse(parameterTypeString, out parameterType))
+#else
+                            ForgeTypeId forgeTypeId = Core.Revit.Query.ForgeTypeId(parameterTypeString);
+                            if (forgeTypeId != null)
+#endif
                             {
                                 name = name.Trim();
 
                                 if (names.IndexOf(name) < 0)
                                 {
                                     names.Add(name);
+
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
                                     ExternalDefinitionCreationOptions externalDefinitionCreationOptions = new ExternalDefinitionCreationOptions(name, parameterType);
+#else
+                                    ExternalDefinitionCreationOptions externalDefinitionCreationOptions = new ExternalDefinitionCreationOptions(name, forgeTypeId);
+#endif
                                     string guid_String = objects[i, index_Guid] as string;
                                     if (!string.IsNullOrEmpty(guid_String))
                                     {
