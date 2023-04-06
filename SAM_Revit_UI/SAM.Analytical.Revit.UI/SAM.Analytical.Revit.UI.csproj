@@ -401,6 +401,10 @@ if "$(ConfigurationName)" == "Debug2022" (
 set Version=Revit 2022
 )
 
+if "$(ConfigurationName)" == "Debug2023" (
+set Version=Revit 2023
+)
+
 if "$(ConfigurationName)" == "Release2020" (
 set Version=Revit 2020
 )
@@ -411,6 +415,10 @@ set Version=Revit 2021
 
 if "$(ConfigurationName)" == "Release2022" (
 set Version=Revit 2022
+)
+
+if "$(ConfigurationName)" == "Release2023" (
+set Version=Revit 2023
 )
 
 set SAM_DIR=$(APPDATA)\SAM\%25Version%25
