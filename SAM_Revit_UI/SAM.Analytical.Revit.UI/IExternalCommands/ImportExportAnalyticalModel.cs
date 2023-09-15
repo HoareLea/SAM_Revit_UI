@@ -109,6 +109,8 @@ namespace SAM.Analytical.Revit.UI
 
                     progressForm.Update("Creating Model");
 
+                    Revit.Modify.UpdatePanelTypes(document, panels);
+
                     List<Element> elements_AnalyticalModel = Revit.Convert.ToRevit(analyticalModel, document, convertSettings);
                     if (elements_AnalyticalModel != null)
                     {
