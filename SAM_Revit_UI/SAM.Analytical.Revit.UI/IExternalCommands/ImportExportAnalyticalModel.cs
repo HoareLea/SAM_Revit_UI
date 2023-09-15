@@ -94,7 +94,7 @@ namespace SAM.Analytical.Revit.UI
 
                 List<Element> elements = new List<Element>();
 
-                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Lad Analytical Model", 5))
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Load Analytical Model", 5))
                 {
                     progressForm.Update("Creating Levels");
 
