@@ -315,7 +315,7 @@ namespace SAM.Analytical.Revit.UI
                             }
 
                             adjacencyCluster_Temp.AddObject(tag);
-                            adjacencyCluster_Temp.AddRelation(element, tag);
+                            adjacencyCluster_Temp.AddRelation(panel, tag);
                         }
                     }
 
