@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using SAM.Core.Revit;
+using SAM.Geometry.Object.Spatial;
 using SAM.Geometry.Revit;
 using SAM.Geometry.Spatial;
 using System;
