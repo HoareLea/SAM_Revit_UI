@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using static Autodesk.Revit.DB.SpecTypeId;
 
 namespace SAM.Analytical.Revit.UI
 {
@@ -208,7 +209,25 @@ namespace SAM.Analytical.Revit.UI
 
             List<SurfaceOutputSpec> surfaceOutputSpecs = new List<SurfaceOutputSpec>() { surfaceOutputSpec };
 
-            analyticalModel = Tas.Modify.RunWorkflow(analyticalModel, path_TBD, null, null, heatingDesignDays, coolingDesignDays, surfaceOutputSpecs, unmetHours, simulate, false);
+            Tas.WorkflowSettings workflowSettings = new Tas.WorkflowSettings()
+            {
+                Path_TBD = path_TBD,
+                Path_gbXML = null,
+                WeatherData = null,
+                DesignDays_Heating = heatingDesignDays,
+                DesignDays_Cooling = coolingDesignDays,
+                SurfaceOutputSpecs = surfaceOutputSpecs,
+                UnmetHours = unmetHours,
+                Simulate = simulate,
+                Sizing = false,
+                UpdateZones = true,
+                UseWidths = false,
+                AddIZAMs = false,
+                SimulateFrom = 1,
+                SimulateTo = 1
+            };
+
+            analyticalModel = Tas.Modify.RunWorkflow(analyticalModel, workflowSettings);
 
             List<Core.ISAMObject> results = null;
 
