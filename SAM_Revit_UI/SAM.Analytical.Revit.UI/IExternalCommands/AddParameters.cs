@@ -6,7 +6,6 @@ using SAM.Analytical.Revit.UI.Properties;
 using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using SAM.Core.Windows;
 using System;
 using System.Linq;
 

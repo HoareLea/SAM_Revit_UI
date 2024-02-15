@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
-using SAM.Core.Windows;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;

@@ -4,7 +4,6 @@ using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Forms;
 using SAM.Core;
 using SAM.Core.Revit;
-using SAM.Core.Windows;
 using SAM.Geometry.Revit;
 using System;
 using System.Collections.Generic;

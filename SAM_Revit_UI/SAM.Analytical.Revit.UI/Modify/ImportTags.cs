@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using SAM.Core.Revit;
-using SAM.Core.Windows;
 using SAM.Geometry.Revit;
 using System.Collections.Generic;
 using System.Linq;

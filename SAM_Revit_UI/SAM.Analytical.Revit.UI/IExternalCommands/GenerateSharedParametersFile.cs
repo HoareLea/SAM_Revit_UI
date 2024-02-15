@@ -10,7 +10,6 @@ using NetOffice.ExcelApi;
 using System.Collections.Generic;
 using System.Linq;
 using SAM.Core.Revit;
-using SAM.Core.Windows;
 
 namespace SAM.Analytical.Revit.UI
 {

@@ -1,13 +1,11 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Analytical.UI;
 using SAM.Core.Revit;
 using SAM.Core.Revit.UI;
 using SAM.Core.Tas;
-using SAM.Geometry.Spatial;
 using SAM.Weather;
 using System;
 using System.Collections.Generic;
@@ -15,7 +13,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
-using static Autodesk.Revit.DB.SpecTypeId;
 
 namespace SAM.Analytical.Revit.UI
 {
