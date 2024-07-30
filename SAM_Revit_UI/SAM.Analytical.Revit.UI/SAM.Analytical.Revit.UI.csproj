@@ -1,139 +1,68 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D835AEF0-8C2C-4345-8F76-062669BCD3E2}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SAM.Analytical.Revit.UI</RootNamespace>
-    <AssemblyName>SAM.Analytical.Revit.UI</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <Configurations>Debug;Release;Debug2021;Debug2017;Debug2018;Debug2019;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2020</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <StartAction>Program</StartAction>
     <DebugEngines>{351668CC-8477-4fbf-BFE3-5F1006E4DB1F}</DebugEngines>
     <StartProgram>C:\Program Files\Autodesk\Revit 2020\Revit.exe</StartProgram>
     <DocumentationFile>..\..\build\SAM.Analytical.Revit.UI.xml</DocumentationFile>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2021|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2021</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2022|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2022</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2020|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2020</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2021|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2021</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2022|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2022</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2023|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2023</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2023|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2023</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2024|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2024</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2024|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2024</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.TAS3D">
@@ -148,7 +77,6 @@
       <HintPath>..\..\references_buildonly\Interop.TSD.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="PresentationCore" />
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">
       <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -224,10 +152,10 @@
     </Reference>
     <Reference Include="SAM.Analytical.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SAM_UI\build\SAM.Analytical.UI.dll</HintPath>
+      <HintPath>..\..\..\SAM_UI\Framework\build\SAM.Analytical.UI.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Analytical.Windows">
-      <HintPath>..\..\..\SAM_Windows\build\SAM.Analytical.Windows.dll</HintPath>
+      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Analytical.Windows.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Architectural, Version=1.0.8096.27678, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -244,7 +172,7 @@
       <HintPath>..\..\..\SAM_Tas\build\SAM.Core.Tas.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Core.Windows">
-      <HintPath>..\..\..\SAM_Windows\build\SAM.Core.Windows.dll</HintPath>
+      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Core.Windows.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Geometry, Version=1.0.8096.27677, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -266,159 +194,26 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SAM_Tas\build\SAM.Weather.Tas.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="TopologicNET">
       <HintPath>..\..\references\TopologicNET.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Convert\ToSAM\AnalyticalModel.cs" />
-    <Compile Include="Enums\GeometryCalculationMethod.cs" />
-    <Compile Include="Forms\CopyTagsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CopyTagsForm.Designer.cs">
-      <DependentUpon>CopyTagsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SimulateForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SimulateForm.Designer.cs">
-      <DependentUpon>SimulateForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IExternalCommandAvailabilities\AlwaysAvailableExternalCommandAvailability.cs" />
-    <Compile Include="IExternalCommands\AddWindowAndDoorTags.cs" />
-    <Compile Include="IExternalCommands\CopyTags.cs" />
-    <Compile Include="IExternalCommands\CreateFloorPlans.cs" />
-    <Compile Include="IExternalCommands\CopyWall.cs" />
-    <Compile Include="IExternalCommands\ImportExportTags.cs" />
-    <Compile Include="IExternalCommands\ModifyInternalCondition.cs" />
-    <Compile Include="IExternalCommands\OpenViewers.cs" />
-    <Compile Include="IExternalCommands\Simulate.cs" />
-    <Compile Include="IExternalCommands\OpenTas.cs" />
-    <Compile Include="IExternalCommands\DeleteSheets.cs" />
-    <Compile Include="IExternalCommands\GenerateSharedParametersFile.cs" />
-    <Compile Include="IExternalCommands\CreateViews.cs" />
-    <Compile Include="IExternalCommands\CreateSheets.cs" />
-    <Compile Include="IExternalCommands\AddSpaceTags.cs" />
-    <Compile Include="IExternalCommands\DeleteViews.cs" />
-    <Compile Include="IExternalCommands\AddWallTags.cs" />
-    <Compile Include="IExternalCommands\Clean.cs" />
-    <Compile Include="IExternalCommands\ImportExportAnalyticalModel.cs" />
-    <Compile Include="IExternalCommands\AddParameters.cs" />
-    <Compile Include="IExternalCommands\RemoveParameters.cs" />
-    <Compile Include="IExternalCommands\Hydra.cs" />
-    <Compile Include="Modify\CopyTags.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Modify\ImportTags.cs" />
-    <Compile Include="Query\DayTypes.cs" />
-    <Compile Include="Query\ParameterNames.cs" />
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Analytical.Revit\SAM.Analytical.Revit.csproj" />
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Architectural.Revit\SAM.Architectural.Revit.csproj" />
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj" />
+    <ProjectReference Include="..\SAM.Core.Revit.UI\SAM.Core.Revit.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Analytical.Revit\SAM.Analytical.Revit.csproj">
-      <Project>{7a976ee2-6c1e-4165-8b29-afd946220556}</Project>
-      <Name>SAM.Analytical.Revit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Architectural.Revit\SAM.Architectural.Revit.csproj">
-      <Project>{dce3c7bc-9efe-449c-b6ff-375886082a4c}</Project>
-      <Name>SAM.Architectural.Revit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj">
-      <Project>{7875201b-420b-42d1-9f8f-0f7bdedb8da2}</Project>
-      <Name>SAM.Core.Revit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SAM.Core.Revit.UI\SAM.Core.Revit.UI.csproj">
-      <Project>{4a52937f-1356-443b-8a6c-6bec0140ac98}</Project>
-      <Name>SAM.Core.Revit.UI</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Forms\CopyTagsForm.resx">
-      <DependentUpon>CopyTagsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SimulateForm.resx">
-      <DependentUpon>SimulateForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_Small.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="NetOfficeFw.Excel">
-      <Version>1.9.1</Version>
+      <Version>1.9.6</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.2</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_GenerateSharedParametersFile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_AddParameters.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_RemoveParameters.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_Hydra.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_T3D.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_TBD.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_TPD.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_TSD.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_NPOStudio.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_PMVAndPPV.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_UKBRStudio2013.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_IDFWizard.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_Simulate.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_RadViewer.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_gbXMLViewer.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SAM_CopyWall.png" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
 if "$(ConfigurationName)" == "Debug2020" (
