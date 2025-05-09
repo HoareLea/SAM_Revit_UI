@@ -1,13 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <OutputType>Library</OutputType>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2017' Or '$(Configuration)' == 'Release2017'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2018' Or '$(Configuration)' == 'Release2018'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2019' Or '$(Configuration)' == 'Release2019'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">net48-windows</TargetFramework>
+	  <TargetFramework Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">net8.0-windows</TargetFramework>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	  <OutputType>Library</OutputType>
     <Deterministic>false</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <Configurations>Debug;Release;Debug2021;Debug2017;Debug2018;Debug2019;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024</Configurations>
+    <Configurations>Debug;Release;Debug2021;Debug2017;Debug2018;Debug2019;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -59,9 +69,19 @@
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2024</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2025|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\build\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Revit2025</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2024|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;Revit2024</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release2025|AnyCPU'">
+    <OutputPath>..\..\build\</OutputPath>
+    <DefineConstants>TRACE;Revit2025</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
@@ -77,6 +97,18 @@
       <HintPath>..\..\references_buildonly\Interop.TSD.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+	  <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
+		  <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPI.dll</HintPath>
+		  <Private>False</Private>
+	  </Reference>
+	  <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
+		  <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPIIFC.dll</HintPath>
+		  <Private>False</Private>
+	  </Reference>
+	  <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
+		  <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPIUI.dll</HintPath>
+		  <Private>False</Private>
+	  </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">
       <HintPath>$(SolutionDir)\references\Revit 2024\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -216,53 +248,61 @@
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
-if "$(ConfigurationName)" == "Debug2020" (
-set Version=Revit 2020
-)
+      if "$(Configuration)" == "Debug2020" (
+      set Version=Revit 2020
+      )
 
-if "$(ConfigurationName)" == "Debug2021" (
-set Version=Revit 2021
-)
+      if "$(Configuration)" == "Debug2021" (
+      set Version=Revit 2021
+      )
 
-if "$(ConfigurationName)" == "Debug2022" (
-set Version=Revit 2022
-)
+      if "$(Configuration)" == "Debug2022" (
+      set Version=Revit 2022
+      )
 
-if "$(ConfigurationName)" == "Debug2023" (
-set Version=Revit 2023
-)
+      if "$(Configuration)" == "Debug2023" (
+      set Version=Revit 2023
+      )
 
-if "$(ConfigurationName)" == "Debug2024" (
-set Version=Revit 2024
-)
+      if "$(Configuration)" == "Debug2024" (
+      set Version=Revit 2024
+      )
 
-if "$(ConfigurationName)" == "Release2020" (
-set Version=Revit 2020
-)
+      if "$(Configuration)" == "Debug2025" (
+      set Version=Revit 2025
+      )
 
-if "$(ConfigurationName)" == "Release2021" (
-set Version=Revit 2021
-)
+      if "$(Configuration)" == "Release2020" (
+      set Version=Revit 2020
+      )
 
-if "$(ConfigurationName)" == "Release2022" (
-set Version=Revit 2022
-)
+      if "$(Configuration)" == "Release2021" (
+      set Version=Revit 2021
+      )
 
-if "$(ConfigurationName)" == "Release2023" (
-set Version=Revit 2023
-)
+      if "$(Configuration)" == "Release2022" (
+      set Version=Revit 2022
+      )
 
-if "$(ConfigurationName)" == "Release2024" (
-set Version=Revit 2024
-)
+      if "$(Configuration)" == "Release2023" (
+      set Version=Revit 2023
+      )
 
-set SAM_DIR=$(APPDATA)\SAM\%25Version%25
-if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
+      if "$(Configuration)" == "Release2024" (
+      set Version=Revit 2024
+      )
 
-Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.dll"
-Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
+      if "$(Configuration)" == "Release2025" (
+      set Version=Revit 2025
+      )
 
-copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
-::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"</PostBuildEvent>
+      set SAM_DIR=$(APPDATA)\SAM\%25Version%25
+      if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
+
+      Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.dll"
+      Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
+
+      copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
+      ::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"</PostBuildEvent>
   </PropertyGroup>
 </Project>

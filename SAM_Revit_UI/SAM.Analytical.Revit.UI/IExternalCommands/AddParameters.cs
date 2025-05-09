@@ -155,6 +155,8 @@ namespace SAM.Analytical.Revit.UI
                                             if (objects[i, 13] is string && objects[i, 12] is string)
                                             {
                                                 string group = objects[i, 12] as string;
+
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
                                                 BuiltInParameterGroup builtInParameterGroup;
                                                 if (Enum.TryParse("PG_" + group, out builtInParameterGroup))
                                                 {
@@ -191,6 +193,44 @@ namespace SAM.Analytical.Revit.UI
                                                         bindingMap.Insert(definition, binding, builtInParameterGroup);
                                                     }
                                                 }
+#else
+                                                ForgeTypeId groupTypeId = Revit.Query.GroupTypeId(group);
+                                                if (groupTypeId != null)
+                                                {
+                                                    CategorySet categorySet = new CategorySet();
+
+                                                    string[] categoryNames = (objects[i, 13] as string).Split(',');
+                                                    foreach (string categoryName in categoryNames)
+                                                    {
+                                                        if (string.IsNullOrEmpty(categoryName))
+                                                            continue;
+
+                                                        BuiltInCategory builtInCategory;
+                                                        if (Enum.TryParse("OST_" + categoryName.Trim().Replace(" ", string.Empty), out builtInCategory))
+                                                        {
+                                                            Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.IntegerValue == (int)builtInCategory);
+                                                            if (category != null)
+                                                                categorySet.Insert(category);
+                                                        }
+                                                    }
+
+                                                    if (categorySet.Size > 0)
+                                                    {
+                                                        string instance = objects[i, 14] as string;
+
+                                                        if (string.IsNullOrEmpty(instance))
+                                                            continue;
+
+                                                        Autodesk.Revit.DB.Binding binding = null;
+                                                        if (instance != null && instance.Trim().ToUpper() == "INSTANCE")
+                                                            binding = externalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
+                                                        else
+                                                            binding = externalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
+
+                                                        bindingMap.Insert(definition, binding, groupTypeId);
+                                                    }
+                                                }
+#endif
                                             }
                                         }
                                     }
