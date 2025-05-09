@@ -55,11 +55,7 @@ namespace SAM.Analytical.Revit.UI
 
             List<Element> elements = new FilteredElementCollector(document).WherePasses(logicalOrFilter).WhereElementIsNotElementType().ToList();
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
             using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.IntegerValue), (Element x) => x.Category.Name, (Element x) =>x.Id.IntegerValue != 311))
-#else
-            using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.Value), (Element x) => x.Category.Name, (Element x) => x.Id.Value != 311))
-#endif
             {
                 treeViewForm.CollapseAll();
                 if(treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)

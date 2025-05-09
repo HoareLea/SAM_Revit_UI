@@ -145,13 +145,8 @@ namespace SAM.Analytical.Revit.UI.Forms
             ComboBoxControl_SourceTagType.AddRange(dictionary.Values, x => Core.Revit.Query.FullName(x));
             if(!ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol))
             {
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
                 familySymbol = dictionary.Values.ToList().Find(x => x.Category.Id.IntegerValue == (int)BuiltInCategory.OST_MEPSpaceTags);
-#else
-                familySymbol = dictionary.Values.ToList().Find(x => x.Category.Id.Value == (long)BuiltInCategory.OST_MEPSpaceTags);
-#endif
-
-                if (familySymbol != null)
+                if(familySymbol != null)
                 {
                     ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol);
                 }
