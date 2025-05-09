@@ -37,9 +37,14 @@ namespace SAM.Analytical.Revit.UI
             List<ViewSheet> viewSheets = new FilteredElementCollector(document).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList();
 
             ViewSheet viewSheet = null;
+
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
             using (Core.Windows.Forms.ComboBoxForm<ViewSheet> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewSheet>("Reference View Sheet", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), viewSheets.Find(x => x.Id.IntegerValue == 725533)) )
+#else
+            using (Core.Windows.Forms.ComboBoxForm<ViewSheet> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewSheet>("Reference View Sheet", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), viewSheets.Find(x => x.Id.Value == 725533)))
+#endif
             {
-                if(comboBoxForm.ShowDialog() != DialogResult.OK)
+                if (comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
                     return Result.Cancelled;
                 }

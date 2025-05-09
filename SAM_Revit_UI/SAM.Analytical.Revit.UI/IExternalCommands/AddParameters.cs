@@ -208,7 +208,12 @@ namespace SAM.Analytical.Revit.UI
                                                         BuiltInCategory builtInCategory;
                                                         if (Enum.TryParse("OST_" + categoryName.Trim().Replace(" ", string.Empty), out builtInCategory))
                                                         {
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
                                                             Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.IntegerValue == (int)builtInCategory);
+#else
+                                                            Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.Value == (long)builtInCategory);
+#endif
+
                                                             if (category != null)
                                                                 categorySet.Insert(category);
                                                         }
