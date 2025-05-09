@@ -82,7 +82,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -100,7 +100,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -118,7 +118,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -136,7 +136,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -154,7 +154,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -172,7 +172,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -190,7 +190,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }
@@ -208,7 +208,7 @@ namespace SAM.Analytical.Revit.UI
                 return Result.Failed;
             }
 
-            System.Diagnostics.Process.Start(path);
+            Core.Revit.Query.StartProcess(path);
 
             return Result.Succeeded;
         }

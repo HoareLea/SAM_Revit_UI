@@ -44,7 +44,7 @@ namespace SAM.Analytical.Revit.UI
     {
         public Result Execute(ExternalCommandData ExternalCommandData, ref string Message, ElementSet Elements)
         {
-            System.Diagnostics.Process.Start("http://www.ladybug.tools/spider-rad-viewer/rad-viewer");
+            Core.Revit.Query.StartProcess("http://www.ladybug.tools/spider-rad-viewer/rad-viewer");
 
             return Result.Succeeded;
         }
@@ -55,7 +55,7 @@ namespace SAM.Analytical.Revit.UI
     {
         public Result Execute(ExternalCommandData ExternalCommandData, ref string Message, ElementSet Elements)
         {
-            System.Diagnostics.Process.Start("https://hoarelea.github.io/sam-viewer/sam-viewer/v-2020-05-29/sam-viewer.html");
+            Core.Revit.Query.StartProcess("https://hoarelea.github.io/sam-viewer/sam-viewer/v-2020-05-29/sam-viewer.html");
 
             return Result.Succeeded;
         }
@@ -66,7 +66,7 @@ namespace SAM.Analytical.Revit.UI
     {
         public Result Execute(ExternalCommandData ExternalCommandData, ref string Message, ElementSet Elements)
         {
-            System.Diagnostics.Process.Start("http://www.ladybug.tools/spider/gbxml-viewer");
+            Core.Revit.Query.StartProcess("http://www.ladybug.tools/spider/gbxml-viewer");
 
             return Result.Succeeded;
         }

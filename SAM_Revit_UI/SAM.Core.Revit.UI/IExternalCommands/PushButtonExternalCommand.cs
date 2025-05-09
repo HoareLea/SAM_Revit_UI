@@ -22,7 +22,7 @@ namespace SAM.Core.Revit.UI
 
         public virtual void Create(RibbonPanel ribbonPanel)
         {
-            PushButton pushButton = ribbonPanel.AddItem(new PushButtonData(Query.FullTypeName(GetType()), Text, GetType().Assembly.Location, GetType().FullName)) as PushButton;
+            PushButton pushButton = ribbonPanel.AddItem(new PushButtonData(Core.Query.FullTypeName(GetType()), Text, GetType().Assembly.Location, GetType().FullName)) as PushButton;
             pushButton.ToolTip = ToolTip;
             pushButton.LargeImage = BitmapSource;
             pushButton.Image = BitmapSource;
