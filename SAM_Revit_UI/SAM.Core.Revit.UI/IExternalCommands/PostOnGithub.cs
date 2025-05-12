@@ -24,7 +24,7 @@ namespace SAM.Core.Revit.UI
 
         public override Autodesk.Revit.UI.Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
         {
-            Revit.Query.StartProcess("https://github.com/HoareLea/SAM/issues/new/choose");
+            Query.StartProcess("https://github.com/HoareLea/SAM/issues/new/choose");
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

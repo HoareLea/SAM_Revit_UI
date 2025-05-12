@@ -198,7 +198,7 @@ namespace SAM.Analytical.Revit.UI
                                     ElementId elementId = aperture.ElementId();
                                     if(elementId != null && elementId != ElementId.InvalidElementId)
                                     {
-                                        apertures_Temp[i].SetValue(ElementParameter.RevitId, Geometry.Revit.Query.IntegerId(document.GetElement(elementId)));
+                                        apertures_Temp[i].SetValue(ElementParameter.RevitId, Geometry.Revit.Query.LongId(document.GetElement(elementId)));
                                         panel_Temp.RemoveAperture(apertures_Temp[i].Guid);
                                         panel_Temp.AddAperture(apertures_Temp[i]);
                                     }

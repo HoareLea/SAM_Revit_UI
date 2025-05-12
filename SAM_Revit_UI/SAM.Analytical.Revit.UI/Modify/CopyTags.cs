@@ -154,7 +154,7 @@ namespace SAM.Analytical.Revit.UI
                         progressForm.Update(tuple.Item1.Name);
                         foreach (View view in tuple.Item3)
                         {
-                            IntegerId viewId = Geometry.Revit.Query.IntegerId(view);
+                            LongId viewId = Geometry.Revit.Query.LongId(view);
 
                             for (int i = 0; i < tuple.Item2.Count; i++)
                             {
