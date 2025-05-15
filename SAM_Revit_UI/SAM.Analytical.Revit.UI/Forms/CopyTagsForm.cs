@@ -95,7 +95,7 @@ namespace SAM.Analytical.Revit.UI.Forms
             ComboBoxControl_SourceTagType.ClearItems();
 
             Autodesk.Revit.DB.View view = ComboBoxControl_SourceTemplate.GetSelectedItem<Autodesk.Revit.DB.View>();
-            if(view == null)
+            if (view == null)
             {
                 return;
             }
@@ -109,7 +109,7 @@ namespace SAM.Analytical.Revit.UI.Forms
 
             List<Autodesk.Revit.DB.View> views = new FilteredElementCollector(document).OfClass(view.GetType()).Cast<Autodesk.Revit.DB.View>().ToList();
             views.RemoveAll(x => x == null || x.IsTemplate || x.ViewType != view.ViewType || x.ViewTemplateId != view.Id);
-            if(views == null || views.Count == 0)
+            if (views == null || views.Count == 0)
             {
                 return;
             }
@@ -120,22 +120,22 @@ namespace SAM.Analytical.Revit.UI.Forms
                 );
 
             List<Element> elements_Tag = new FilteredElementCollector(document).WherePasses(elementFilter).ToList();
-            if(elements_Tag == null || elements_Tag.Count == 0)
+            if (elements_Tag == null || elements_Tag.Count == 0)
             {
                 return;
             }
 
             Dictionary<ElementId, FamilySymbol> dictionary = new Dictionary<ElementId, FamilySymbol>();
-            foreach(Element element in elements_Tag)
+            foreach (Element element in elements_Tag)
             {
                 ElementId elementId = element?.GetTypeId();
-                if(elementId == null || elementId == ElementId.InvalidElementId)
+                if (elementId == null || elementId == ElementId.InvalidElementId)
                 {
                     continue;
                 }
 
                 if (dictionary.ContainsKey(elementId))
-                    {
+                {
                     continue;
                 }
 
@@ -143,10 +143,15 @@ namespace SAM.Analytical.Revit.UI.Forms
             }
 
             ComboBoxControl_SourceTagType.AddRange(dictionary.Values, x => Core.Revit.Query.FullName(x));
-            if(!ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol))
+            if (!ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol))
             {
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
                 familySymbol = dictionary.Values.ToList().Find(x => x.Category.Id.IntegerValue == (int)BuiltInCategory.OST_MEPSpaceTags);
                 if(familySymbol != null)
+#else
+                familySymbol = dictionary.Values.ToList().Find(x => x.Category.Id.Value == (long)BuiltInCategory.OST_MEPSpaceTags);
+#endif
+                if (familySymbol != null)
                 {
                     ComboBoxControl_SourceTagType.SetSelectedItem(familySymbol);
                 }

@@ -41,7 +41,11 @@ namespace SAM.Analytical.Revit.UI
 
             List<int> ids = new List<int>() { 725518, 725533, 802983, 805316, 835480, 1007139, 1008572 };
 
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
             using (Core.Windows.Forms.TreeViewForm<ViewSheet> treeViewForm = new Core.Windows.Forms.TreeViewForm<ViewSheet>("Select Sheets", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), null, (ViewSheet x) => !ids.Contains(x.Id.IntegerValue)))
+#else
+            using (Core.Windows.Forms.TreeViewForm<ViewSheet> treeViewForm = new Core.Windows.Forms.TreeViewForm<ViewSheet>("Select Sheets", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), null, (ViewSheet x) => !ids.Contains(System.Convert.ToInt32(x.Id.Value))))
+#endif
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {

@@ -41,7 +41,11 @@ namespace SAM.Analytical.Revit.UI
             }
 
             ViewPlan viewPlan = null;
+#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
             using (Core.Windows.Forms.ComboBoxForm<ViewPlan> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.IntegerValue == 312)))
+#else
+            using (Core.Windows.Forms.ComboBoxForm<ViewPlan> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.Value == 312)))
+#endif
             {
                 if(comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
