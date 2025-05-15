@@ -8,8 +8,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.dll
-*.exe
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -331,9 +329,3 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-
-#Include build only references
-#!references_buildonly/**.*
-
-#Include build only references
-#!references/**.*
