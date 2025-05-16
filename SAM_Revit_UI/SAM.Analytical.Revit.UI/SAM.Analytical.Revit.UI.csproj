@@ -215,9 +215,8 @@
     <Reference Include="SAM.Analytical.Topologic">
       <HintPath>..\..\..\SAM_Topologic\build\SAM.Analytical.Topologic.dll</HintPath>
     </Reference>
-    <Reference Include="SAM.Analytical.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SAM_UI\Framework\build\SAM.Analytical.UI.dll</HintPath>
+    <Reference Include="SAM.Analytical.UI">
+      <HintPath>..\..\..\SAM_UI\build\SAM.Analytical.UI.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Analytical.Windows">
       <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Analytical.Windows.dll</HintPath>
@@ -267,6 +266,8 @@
     <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Analytical.Revit\SAM.Analytical.Revit.csproj" />
     <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Architectural.Revit\SAM.Architectural.Revit.csproj" />
     <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj" />
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Geometry.Revit\SAM.Geometry.Revit.csproj" />
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Units.Revit\SAM.Units.Revit.csproj" />
     <ProjectReference Include="..\SAM.Core.Revit.UI\SAM.Core.Revit.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
