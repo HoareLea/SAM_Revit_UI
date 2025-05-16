@@ -194,6 +194,9 @@
     </PackageReference>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj" />
+  </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
       if "$(Configuration)" == "Debug2020" (
