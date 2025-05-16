@@ -25,7 +25,7 @@ namespace SAM.Analytical.Revit.UI
 
         public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
         {
-            Core.Revit.Query.StartProcess("https://hlhydra.azurewebsites.net/index.html");
+            Core.Query.StartProcess(Core.Link.Hydra);
             return Result.Succeeded;
         }
     }
