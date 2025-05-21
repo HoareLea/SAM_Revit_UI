@@ -219,7 +219,7 @@
       <HintPath>..\..\..\SAM_UI\build\SAM.Analytical.UI.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Analytical.Windows">
-      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Analytical.Windows.dll</HintPath>
+      <HintPath>..\..\..\SAM_Windows\build\SAM.Analytical.Windows.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Architectural, Version=1.0.8096.27678, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -236,7 +236,7 @@
       <HintPath>..\..\..\SAM_Tas\build\SAM.Core.Tas.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Core.Windows">
-      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Core.Windows.dll</HintPath>
+      <HintPath>..\..\..\SAM_Windows\build\SAM.Core.Windows.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Geometry, Version=1.0.8096.27677, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

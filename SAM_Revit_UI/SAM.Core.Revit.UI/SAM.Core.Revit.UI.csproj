@@ -182,9 +182,8 @@
     <Reference Include="SAM.Core.Revit">
       <HintPath>..\..\..\SAM_Revit\build\SAM.Core.Revit.dll</HintPath>
     </Reference>
-    <Reference Include="SAM.Core.Windows, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Core.Windows.dll</HintPath>
+    <Reference Include="SAM.Core.Windows">
+      <HintPath>..\..\..\SAM_Windows\build\SAM.Core.Windows.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
