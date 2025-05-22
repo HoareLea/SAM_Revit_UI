@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2026|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Revit2025</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Revit2026</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2024|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
@@ -87,7 +87,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release2026|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
-    <DefineConstants>TRACE;Revit2025</DefineConstants>
+    <DefineConstants>TRACE;Revit2026</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
@@ -175,8 +175,7 @@
       <HintPath>$(SolutionDir)\references\Revit 2020\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SAM.Core, Version=1.0.8125.19527, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SAM.Core">
       <HintPath>..\..\..\SAM\build\SAM.Core.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Core.Revit">
@@ -192,7 +191,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.5"  PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj" />
