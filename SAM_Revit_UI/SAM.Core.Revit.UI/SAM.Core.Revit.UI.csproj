@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2017' Or '$(Configuration)' == 'Release2017'">net48-windows</TargetFramework>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2018' Or '$(Configuration)' == 'Release2018'">net48-windows</TargetFramework>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2019' Or '$(Configuration)' == 'Release2019'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">net8.0-windows</TargetFramework>
-    <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
+      <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <OutputType>Library</OutputType>
@@ -18,7 +15,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <Configurations>Debug;Release;Debug2021;Debug2017;Debug2018;Debug2019;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
+    <Configurations>Debug;Release;Debug2021;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
 	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|AnyCPU'">
@@ -111,7 +108,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-	<PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+	<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
 
 	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
 	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
