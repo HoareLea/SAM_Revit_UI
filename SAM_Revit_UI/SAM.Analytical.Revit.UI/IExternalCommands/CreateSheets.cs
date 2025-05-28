@@ -26,12 +26,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document ==null)
+            Document document = Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<ViewSheet> viewSheets = new FilteredElementCollector(document).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList();
@@ -45,31 +45,31 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 viewSheet = comboBoxForm.SelectedItem;
             }
 
-            if(viewSheet == null)
+            if (viewSheet == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<ViewPlan> viewPlans = new FilteredElementCollector(document).OfClass(typeof(ViewPlan)).Cast<ViewPlan>().ToList();
             viewPlans?.RemoveAll(x => !x.IsTemplate);
-            if(viewPlans == null || viewPlans.Count == 0)
+            if (viewPlans == null || viewPlans.Count == 0)
             {
                 MessageBox.Show("Could not find Template View Plans");
-                return Result.Failed;
+                return;
             }
 
             List<string> templateNames = null;
-            using (Core.Windows.Forms.TreeViewForm<ViewPlan> treeViewForm = new Core.Windows.Forms.TreeViewForm<ViewPlan>("Select Templates", viewPlans, (ViewPlan x) => x.Name, null,(ViewPlan x) => x.Name == "Cooling Load" || x.Name == "Heating Load"))
+            using (Core.Windows.Forms.TreeViewForm<ViewPlan> treeViewForm = new Core.Windows.Forms.TreeViewForm<ViewPlan>("Select Templates", viewPlans, (ViewPlan x) => x.Name, null, (ViewPlan x) => x.Name == "Cooling Load" || x.Name == "Heating Load"))
             {
                 if (treeViewForm.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -81,8 +81,6 @@ namespace SAM.Analytical.Revit.UI
                 List<ViewSheet> result = Core.Revit.Create.Sheets(viewSheet, templateNames, true);
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }

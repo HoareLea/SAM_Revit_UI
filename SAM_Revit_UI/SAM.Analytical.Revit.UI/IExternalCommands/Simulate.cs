@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Analytical.UI;
 using SAM.Core.Revit;
@@ -32,12 +31,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
+            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
             if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             string path = document.PathName;
@@ -55,7 +54,7 @@ namespace SAM.Analytical.Revit.UI
                     folderBrowserDialog.ShowNewFolderButton = true;
                     if (folderBrowserDialog.ShowDialog() != DialogResult.OK)
                     {
-                        return Result.Cancelled;
+                        return;
                     }
 
                     path = System.IO.Path.Combine(folderBrowserDialog.SelectedPath, name + ".rvt");
@@ -63,7 +62,7 @@ namespace SAM.Analytical.Revit.UI
 
                 if (string.IsNullOrWhiteSpace(path))
                 {
-                    return Result.Failed;
+                    return;
                 }
 
                 document.SaveAs(path);
@@ -85,7 +84,7 @@ namespace SAM.Analytical.Revit.UI
 
                 if (simulateForm.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 projectName = simulateForm.ProjectName;
@@ -103,7 +102,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (weatherData == null || geometryCalculationMethod == GeometryCalculationMethod.Undefined)
             {
-                return Result.Failed;
+                return;
             }
 
             AnalyticalModel analyticalModel = null;
@@ -121,7 +120,7 @@ namespace SAM.Analytical.Revit.UI
                 if (analyticalModel == null)
                 {
                     MessageBox.Show("Could not convert to AnalyticalModel");
-                    return Result.Failed;
+                    return;
                 }
 
                 IEnumerable<Core.IMaterial> materials = Analytical.Query.Materials(analyticalModel.AdjacencyCluster, Analytical.Query.DefaultMaterialLibrary());
@@ -403,7 +402,6 @@ namespace SAM.Analytical.Revit.UI
 
             MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}h {1}m {2}s", hoursString, minutesString, secondsString));
 
-            return Result.Succeeded;
         }
     }
 }

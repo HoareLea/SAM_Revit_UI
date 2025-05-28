@@ -26,18 +26,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<ViewPlan> viewPlans = new FilteredElementCollector(document).OfClass(typeof(ViewPlan)).Cast<ViewPlan>().ToList();
-            if(viewPlans == null || viewPlans.Count == 0)
+            if (viewPlans == null || viewPlans.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             ViewPlan viewPlan = null;
@@ -47,25 +47,25 @@ namespace SAM.Analytical.Revit.UI
             using (Core.Windows.Forms.ComboBoxForm<ViewPlan> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.Value == 312)))
 #endif
             {
-                if(comboBoxForm.ShowDialog() != DialogResult.OK)
+                if (comboBoxForm.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 viewPlan = comboBoxForm.SelectedItem;
             }
 
-            if(viewPlan == null)
+            if (viewPlan == null)
             {
                 MessageBox.Show("Could not find view to be duplicated");
-                return Result.Failed;
+                return;
             }
 
             List<Level> levels = new FilteredElementCollector(document).OfClass(typeof(Level)).Cast<Level>().ToList();
-            if(levels == null || levels.Count == 0)
+            if (levels == null || levels.Count == 0)
             {
                 MessageBox.Show("Could not find levels");
-                return Result.Failed;
+                return;
             }
 
             using (Transaction transaction = new Transaction(document, "Create Views"))
@@ -74,8 +74,6 @@ namespace SAM.Analytical.Revit.UI
                 List<ViewPlan> result = Core.Revit.Modify.DuplicateViewPlan(viewPlan, levels, true);
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }

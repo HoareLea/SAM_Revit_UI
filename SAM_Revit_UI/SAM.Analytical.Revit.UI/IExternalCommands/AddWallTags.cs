@@ -26,28 +26,27 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData.Application.ActiveUIDocument.Document;
+            Document document = Document;
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             List<ElementType> elementTypes = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_WallTags).OfClass(typeof(ElementType)).Cast<ElementType>().ToList();
             if (elementTypes == null || elementTypes.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             List<Autodesk.Revit.DB.Wall> walls = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_Walls).OfClass(typeof(Autodesk.Revit.DB.Wall)).Cast<Autodesk.Revit.DB.Wall>().ToList();
             if (walls == null || walls.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
-
 
             for (int i = views.Count - 1; i >= 0; i--)
             {
@@ -76,9 +75,9 @@ namespace SAM.Analytical.Revit.UI
             using (Core.Windows.Forms.TextBoxForm<double> textBoxForm = new Core.Windows.Forms.TextBoxForm<double>("Wall Length", "Min Wall Length"))
             {
                 textBoxForm.Value = minLength;
-                if(textBoxForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (textBoxForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 minLength = textBoxForm.Value;
@@ -90,7 +89,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -98,7 +97,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (templateNames == null || templateNames.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
 #if Revit2017 || Revit2018 || Revit2019 || Revit2020
@@ -107,23 +106,23 @@ namespace SAM.Analytical.Revit.UI
             minLength = UnitUtils.ConvertToInternalUnits(minLength, UnitTypeId.Meters);
 #endif
 
-            for(int i = walls.Count - 1; i >= 0; i--)
+            for (int i = walls.Count - 1; i >= 0; i--)
             {
                 LocationCurve locationCurve = walls[i]?.Location as LocationCurve;
-                if(locationCurve == null)
+                if (locationCurve == null)
                 {
                     walls.RemoveAt(i);
                     continue;
                 }
 
                 Curve curve = locationCurve.Curve;
-                if(curve == null)
+                if (curve == null)
                 {
                     walls.RemoveAt(i);
                     continue;
                 }
 
-                if(curve.Length < minLength)
+                if (curve.Length < minLength)
                 {
                     walls.RemoveAt(i);
                     continue;
@@ -158,8 +157,6 @@ namespace SAM.Analytical.Revit.UI
                     transaction.Commit();
                 }
             }
-
-            return Result.Succeeded;
         }
     }
 }

@@ -26,18 +26,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             for (int i = views.Count - 1; i >= 0; i--)
@@ -75,7 +75,7 @@ namespace SAM.Analytical.Revit.UI
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
@@ -83,7 +83,7 @@ namespace SAM.Analytical.Revit.UI
 
             if (templateNames == null || templateNames.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             List<Tuple<ElementId, List<FamilyInstance>>> tuples = new List<Tuple<ElementId, List<FamilyInstance>>>();
@@ -119,8 +119,6 @@ namespace SAM.Analytical.Revit.UI
                     transaction.Commit();
                 }
             }
-
-            return Result.Succeeded;
         }
     }
 }

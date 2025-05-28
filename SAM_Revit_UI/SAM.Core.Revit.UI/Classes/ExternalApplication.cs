@@ -5,33 +5,38 @@ using System.Reflection;
 
 namespace SAM.Core.Revit.UI
 {
-    public class ExternalApplication : IExternalApplication
+    public class ExternalApplication : Nice3point.Revit.Toolkit.External.ExternalApplication
     {
         public static string TabName { get; } = "SAM";
 
         public static Windows.WindowHandle WindowHandle { get; } = new Windows.WindowHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
 
-        public Autodesk.Revit.UI.Result OnShutdown(UIControlledApplication uIControlledApplication)
+        public static string GetAssemblyPath()
         {
-            return Autodesk.Revit.UI.Result.Succeeded;
+            return Assembly.GetExecutingAssembly()?.Location;
         }
 
-        public Autodesk.Revit.UI.Result OnStartup(UIControlledApplication uIControlledApplication)
+        public string GetAssemblyDirectory()
         {
-            uIControlledApplication.CreateRibbonTab(TabName);
+            return System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location);
+        }
+
+        public override void OnStartup()
+        {
+            Application.CreateRibbonTab(TabName);
 
             List<Assembly> assemblies = new List<Assembly>();
 
             string directory = GetAssemblyDirectory();
-            if(!string.IsNullOrWhiteSpace(directory) && System.IO.Directory.Exists(directory))
+            if (!string.IsNullOrWhiteSpace(directory) && System.IO.Directory.Exists(directory))
             {
                 string[] paths = System.IO.Directory.GetFiles(directory, "*.Revit.UI.dll");
-                if(paths != null)
+                if (paths != null)
                 {
-                    foreach(string path in paths)
+                    foreach (string path in paths)
                     {
                         Assembly assembly = Assembly.LoadFrom(path);
-                        if(assembly == null)
+                        if (assembly == null)
                         {
                             continue;
                         }
@@ -42,7 +47,7 @@ namespace SAM.Core.Revit.UI
             }
 
             List<ISAMRibbonItemData> sAMRibbonItemDatas = new List<ISAMRibbonItemData>();
-            foreach(Assembly assembly in assemblies)
+            foreach (Assembly assembly in assemblies)
             {
                 Type[] types = assembly?.GetExportedTypes();
                 if (types == null)
@@ -69,7 +74,7 @@ namespace SAM.Core.Revit.UI
 
             sAMRibbonItemDatas.Sort((x, y) => x.Index.CompareTo(y.Index));
 
-            foreach(ISAMRibbonItemData sAMRibbonItemData in sAMRibbonItemDatas)
+            foreach (ISAMRibbonItemData sAMRibbonItemData in sAMRibbonItemDatas)
             {
                 string ribbonPanelName = sAMRibbonItemData.RibbonPanelName;
                 if (string.IsNullOrWhiteSpace(ribbonPanelName))
@@ -77,26 +82,14 @@ namespace SAM.Core.Revit.UI
                     ribbonPanelName = "General";
                 }
 
-                RibbonPanel ribbonPanel = uIControlledApplication.GetRibbonPanels(TabName)?.Find(x => x.Name == ribbonPanelName);
+                RibbonPanel ribbonPanel = Application.GetRibbonPanels(TabName)?.Find(x => x.Name == ribbonPanelName);
                 if (ribbonPanel == null)
                 {
-                    ribbonPanel = uIControlledApplication.CreateRibbonPanel(TabName, ribbonPanelName);
+                    ribbonPanel = Application.CreateRibbonPanel(TabName, ribbonPanelName);
                 }
 
                 sAMRibbonItemData.Create(ribbonPanel);
             }
-
-            return Autodesk.Revit.UI.Result.Succeeded;
-        }
-
-        public static string GetAssemblyPath()
-        {
-            return Assembly.GetExecutingAssembly()?.Location;
-        }
-
-        public string GetAssemblyDirectory()
-        {
-            return System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location);
         }
     }
 }

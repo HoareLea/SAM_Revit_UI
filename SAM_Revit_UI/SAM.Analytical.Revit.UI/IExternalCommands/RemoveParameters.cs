@@ -25,12 +25,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             string path_Excel = null;
@@ -47,13 +47,13 @@ namespace SAM.Analytical.Revit.UI
 
             if (string.IsNullOrEmpty(path_Excel))
             {
-                return Result.Cancelled;
+                return;
             }
 
             object[,] objects = Core.Excel.Query.Values(path_Excel, "Live");
             if (objects == null || objects.GetLength(0) <= 1 || objects.GetLength(1) < 11)
             {
-                return Result.Failed;
+                return;
             }
 
             int index_Group = 2;
@@ -62,7 +62,7 @@ namespace SAM.Analytical.Revit.UI
             List<string> names_Selected = Query.ParameterNames(objects, index_Group, index_Name);
             if (names_Selected == null || names_Selected.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             using (Transaction transaction = new Transaction(document, "Remove Parameters"))
@@ -108,8 +108,6 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }

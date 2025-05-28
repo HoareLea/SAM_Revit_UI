@@ -25,36 +25,36 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
-            for(int i=views.Count - 1; i >= 0; i--)
+            for (int i = views.Count - 1; i >= 0; i--)
             {
                 View view = views[i];
-                if(view == null)
+                if (view == null)
                 {
                     views.RemoveAt(i);
                     continue;
                 }
 
-                if(view.ViewType != ViewType.FloorPlan)
+                if (view.ViewType != ViewType.FloorPlan)
                 {
                     views.RemoveAt(i);
                     continue;
                 }
 
-                if(!view.IsTemplate)
+                if (!view.IsTemplate)
                 {
                     views.RemoveAt(i);
                     continue;
@@ -66,17 +66,17 @@ namespace SAM.Analytical.Revit.UI
 
             using (Core.Windows.Forms.TreeViewForm<View> treeViewForm = new Core.Windows.Forms.TreeViewForm<View>("Select Templates", views, (View view) => view.Name, null, (View view) => templateNames.Contains(view.Name)))
             {
-                if(treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 views = treeViewForm.SelectedItems;
             }
 
-            if(views == null || views.Count == 0)
+            if (views == null || views.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             using (Transaction transaction = new Transaction(document, "Create Views"))
@@ -85,8 +85,6 @@ namespace SAM.Analytical.Revit.UI
                 Core.Revit.Modify.DuplicateViews(document, "00_Reference", views.ConvertAll(x => x.Name), new ViewType[] { ViewType.FloorPlan });
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }
