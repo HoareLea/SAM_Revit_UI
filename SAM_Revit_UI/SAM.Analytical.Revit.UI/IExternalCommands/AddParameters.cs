@@ -109,7 +109,7 @@ namespace SAM.Analytical.Revit.UI
                                 string parameterTypeString = objects[i, index_ParameterType] as string;
                                 parameterTypeString = parameterTypeString.Replace(" ", string.Empty);
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
+#if Revit2020 || Revit2021 || Revit2022
                                 ParameterType parameterType = ParameterType.Invalid;
                                 if (Enum.TryParse(parameterTypeString, out parameterType))
 #else

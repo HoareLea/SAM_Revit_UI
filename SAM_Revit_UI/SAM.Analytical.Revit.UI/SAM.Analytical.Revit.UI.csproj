@@ -6,7 +6,7 @@
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">net8.0-windows</TargetFramework>
-        <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <OutputType>Library</OutputType>
@@ -16,6 +16,7 @@
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Configurations>Debug;Release;Debug2021;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -105,15 +106,27 @@
   <ItemGroup>
     <Reference Include="Interop.TAS3D">
       <HintPath>..\..\references_buildonly\Interop.TAS3D.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Interop.TasConv">
+      <HintPath>..\..\references_buildonly\Interop.TasConv.dll</HintPath>
     </Reference>
     <Reference Include="Interop.TBD">
       <HintPath>..\..\references_buildonly\Interop.TBD.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Interop.TCD">
+      <HintPath>..\..\references_buildonly\Interop.TCD.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.TIC">
+      <HintPath>..\..\references_buildonly\Interop.TIC.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.TPD">
+      <HintPath>..\..\references_buildonly\Interop.TPD.dll</HintPath>
     </Reference>
     <Reference Include="Interop.TSD">
       <HintPath>..\..\references_buildonly\Interop.TSD.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Interop.TWD">
+      <HintPath>..\..\references_buildonly\Interop.TWD.dll</HintPath>
     </Reference>
     <Reference Include="SAM.Analytical, Version=1.0.8096.27679, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -155,10 +168,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SAM\build\SAM.Geometry.dll</HintPath>
     </Reference>
-    <Reference Include="SAM.Geometry.Revit, Version=1.0.8164.27132, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SAM_Revit\build\SAM.Geometry.Revit.dll</HintPath>
-    </Reference>
     <Reference Include="SAM.Geometry.SolarCalculator, Version=1.0.8096.18454, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SAM_SolarCalculator\build\SAM.Geometry.SolarCalculator.dll</HintPath>
@@ -184,6 +193,8 @@
     <ProjectReference Include="..\SAM.Core.Revit.UI\SAM.Core.Revit.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
+
+	  <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.6" />
 
 	  <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
 	  <PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
@@ -225,6 +236,12 @@
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" GeneratePathProperty="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(PkgSystem_Drawing_Common)\lib\net7.0\System.Drawing.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>

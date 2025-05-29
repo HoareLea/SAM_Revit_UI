@@ -108,7 +108,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-	<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
+	<PackageReference Include="System.Drawing.Common" Version="7.0.0" GeneratePathProperty="true" />
 
 	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
 	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
@@ -145,6 +145,12 @@
 	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2020'))" Version="2020.2.60" />
 	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2020'))" Version="2020.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(PkgSystem_Drawing_Common)\lib\net7.0\System.Drawing.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <PostBuildEvent>
       if "$(Configuration)" == "Debug2020" (
@@ -174,7 +180,7 @@
       if "$(Configuration)" == "Debug2026" (
       set Version=Revit 2026
       )
-      
+
       if "$(Configuration)" == "Release2020" (
       set Version=Revit 2020
       )
@@ -206,6 +212,11 @@
       set SAM_DIR=$(APPDATA)\SAM\%25Version%25
       if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
 
-      copy "$(TargetDir)*.dll" "%25SAM_DIR%25"</PostBuildEvent>
+      Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.dll"
+      Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
+
+      copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
+      ::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
