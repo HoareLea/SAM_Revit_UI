@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
 using System.Windows.Media.Imaging;
@@ -23,11 +22,9 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Revit.Modify.CopyWall(externalCommandData?.Application?.ActiveUIDocument);
-
-            return Result.Succeeded;
+            Revit.Modify.CopyWall(ExternalCommandData?.Application?.ActiveUIDocument);
         }
     }
 }

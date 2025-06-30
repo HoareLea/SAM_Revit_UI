@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
 using SAM.Core.Revit.UI;
 using System;
@@ -26,18 +25,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
+            Document document = Document;
             if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<Autodesk.Revit.DB.Mechanical.SpaceTagType> spaceTagTypes = new FilteredElementCollector(document).OfCategory(BuiltInCategory.OST_MEPSpaceTags).WhereElementIsElementType().Cast<Autodesk.Revit.DB.Mechanical.SpaceTagType>().ToList();
-            if(spaceTagTypes == null || spaceTagTypes.Count == 0)
+            if (spaceTagTypes == null || spaceTagTypes.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             List<Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>>> tuples = new List<Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>>>();
@@ -63,16 +62,16 @@ namespace SAM.Analytical.Revit.UI
             {
                 transaction.Start();
 
-                foreach(Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>> tuple in tuples)
+                foreach (Tuple<Autodesk.Revit.DB.Mechanical.SpaceTagType, List<string>> tuple in tuples)
                 {
-                    if(tuple.Item1 == null || tuple.Item2 == null || tuple.Item2.Count == 0)
+                    if (tuple.Item1 == null || tuple.Item2 == null || tuple.Item2.Count == 0)
                     {
                         continue;
                     }
 
                     List<string> templateNames = tuple.Item2;
                     templateNames.RemoveAll(x => string.IsNullOrWhiteSpace(x));
-                    if(templateNames == null || templateNames.Count == 0)
+                    if (templateNames == null || templateNames.Count == 0)
                     {
                         continue;
                     }
@@ -83,8 +82,6 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
-
-                return Result.Succeeded;
         }
     }
 }

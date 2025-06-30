@@ -27,12 +27,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             string path_Excel = null;
@@ -43,7 +43,7 @@ namespace SAM.Analytical.Revit.UI
                 openFileDialog.Title = "Select Excel file";
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 path_Excel = openFileDialog.FileName;
@@ -51,13 +51,13 @@ namespace SAM.Analytical.Revit.UI
 
             if (string.IsNullOrWhiteSpace(path_Excel))
             {
-                return Result.Failed;
+                return;
             }
 
             object[,] objects = Core.Excel.Query.Values(path_Excel, "Live");
             if (objects == null || objects.GetLength(0) <= 1 || objects.GetLength(1) < 11)
             {
-                return Result.Failed;
+                return;
             }
 
             int index_Group = 2;
@@ -67,22 +67,22 @@ namespace SAM.Analytical.Revit.UI
 
             string[] unselected = new string[] { "DetailItem_AHU", "Space_Security", "Construction_CFD", "Space_LightingElec", "Space_DHW", "Space_Electrical", "Plant_Electrical", "DetailItem_Emitter", "Space_FireAlarm", "Construction_Detail", "Space_Data", "DetailItem_Benchmark", "DetailItem_ICData", "DetailItem_MEPInput", "DetailItem_Profiles", "DetailItem_Material", "Architect_Required" };
             List<string> names_Selected = Query.ParameterNames(objects, index_Group, index_Name, unselected);
-            if(names_Selected == null || names_Selected.Count == 0)
+            if (names_Selected == null || names_Selected.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
-            string path_SharedParametersFile = externalCommandData.Application.Application.SharedParametersFilename;
+            string path_SharedParametersFile = ExternalCommandData.Application.Application.SharedParametersFilename;
 
             string path_SharedParametersFile_Temp = System.IO.Path.GetTempFileName();
             System.IO.File.WriteAllText(path_SharedParametersFile_Temp, string.Empty);
-            externalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile_Temp;
+            ExternalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile_Temp;
 
             using (Transaction transaction = new Transaction(document, "Add Parameters"))
             {
                 transaction.Start();
 
-                using (Core.Revit.SharedParameterFileWrapper sharedParameterFileWrapper = new Core.Revit.SharedParameterFileWrapper(externalCommandData.Application.Application))
+                using (Core.Revit.SharedParameterFileWrapper sharedParameterFileWrapper = new Core.Revit.SharedParameterFileWrapper(ExternalCommandData.Application.Application))
                 {
                     sharedParameterFileWrapper.Open();
 
@@ -101,7 +101,7 @@ namespace SAM.Analytical.Revit.UI
                                 else
                                     progressForm.Update(name);
 
-                                if(!names_Selected.Contains(name))
+                                if (!names_Selected.Contains(name))
                                 {
                                     continue;
                                 }
@@ -109,7 +109,7 @@ namespace SAM.Analytical.Revit.UI
                                 string parameterTypeString = objects[i, index_ParameterType] as string;
                                 parameterTypeString = parameterTypeString.Replace(" ", string.Empty);
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
+#if Revit2020 || Revit2021 || Revit2022
                                 ParameterType parameterType = ParameterType.Invalid;
                                 if (Enum.TryParse(parameterTypeString, out parameterType))
 #else
@@ -124,7 +124,7 @@ namespace SAM.Analytical.Revit.UI
                                         names.Add(name);
 
                                         Definition definition = sharedParameterFileWrapper.Find(name);
-                                        if(definition == null)
+                                        if (definition == null)
                                         {
 
 #if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
@@ -144,13 +144,13 @@ namespace SAM.Analytical.Revit.UI
                                             }
 
                                             string parameterGroup = objects[i, index_Group] as string;
-                                            if(!string.IsNullOrWhiteSpace(parameterGroup))
+                                            if (!string.IsNullOrWhiteSpace(parameterGroup))
                                             {
                                                 definition = sharedParameterFileWrapper.Create(parameterGroup, externalDefinitionCreationOptions);
                                             }
                                         }
 
-                                        if(definition != null)
+                                        if (definition != null)
                                         {
                                             if (objects[i, 13] is string && objects[i, 12] is string)
                                             {
@@ -186,9 +186,9 @@ namespace SAM.Analytical.Revit.UI
 
                                                         Autodesk.Revit.DB.Binding binding = null;
                                                         if (instance != null && instance.Trim().ToUpper() == "INSTANCE")
-                                                            binding = externalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
+                                                            binding = ExternalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
                                                         else
-                                                            binding = externalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
+                                                            binding = ExternalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
 
                                                         bindingMap.Insert(definition, binding, builtInParameterGroup);
                                                     }
@@ -228,9 +228,9 @@ namespace SAM.Analytical.Revit.UI
 
                                                         Autodesk.Revit.DB.Binding binding = null;
                                                         if (instance != null && instance.Trim().ToUpper() == "INSTANCE")
-                                                            binding = externalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
+                                                            binding = ExternalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
                                                         else
-                                                            binding = externalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
+                                                            binding = ExternalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
 
                                                         bindingMap.Insert(definition, binding, groupTypeId);
                                                     }
@@ -253,12 +253,10 @@ namespace SAM.Analytical.Revit.UI
                 transaction.Commit();
             }
 
-            externalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile;
-            externalCommandData.Application.Application.OpenSharedParameterFile();
+            ExternalCommandData.Application.Application.SharedParametersFilename = path_SharedParametersFile;
+            ExternalCommandData.Application.Application.OpenSharedParameterFile();
 
             System.IO.File.Delete(path_SharedParametersFile_Temp);
-
-            return Result.Succeeded;
         }
     }
 }

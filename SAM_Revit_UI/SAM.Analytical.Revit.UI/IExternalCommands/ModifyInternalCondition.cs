@@ -27,46 +27,46 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
+            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
             if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             IList<Reference> references = null;
 
             try
             {
-                references = externalCommandData.Application.ActiveUIDocument.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element);
+                references = ExternalCommandData.Application.ActiveUIDocument.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element);
             }
             catch
             {
-                return Result.Failed;
+                return;
             }
 
 
-            if(references == null)
+            if (references == null)
             {
-                return Result.Cancelled;
+                return;
             }
 
             List<Autodesk.Revit.DB.Mechanical.Space> spaces_Revit = new List<Autodesk.Revit.DB.Mechanical.Space>();
-            foreach(Reference reference in references)
+            foreach (Reference reference in references)
             {
                 Autodesk.Revit.DB.Mechanical.Space space_Revit = document.GetElement(reference) as Autodesk.Revit.DB.Mechanical.Space;
                 if (space_Revit == null)
                 {
-                    continue; ;
+                    continue;
                 }
 
                 spaces_Revit.Add(space_Revit);
             }
 
-            if(spaces_Revit == null || spaces_Revit.Count == 0)
+            if (spaces_Revit == null || spaces_Revit.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             AnalyticalModel analyticalModel = null;
@@ -81,7 +81,7 @@ namespace SAM.Analytical.Revit.UI
             }
 
             ProfileLibrary profileLibrary = null;
-            if(profileLibrary == null)
+            if (profileLibrary == null)
             {
                 profileLibrary = Analytical.Query.DefaultProfileLibrary();
             }
@@ -97,9 +97,9 @@ namespace SAM.Analytical.Revit.UI
                     try
                     {
                         internalConditionLibrary = Core.Convert.ToSAM<InternalConditionLibrary>(json)?.FirstOrDefault();
-                        if(internalConditionLibrary != null)
+                        if (internalConditionLibrary != null)
                         {
-                            foreach(InternalCondition internalCondition in internalConditionLibrary.GetInternalConditions())
+                            foreach (InternalCondition internalCondition in internalConditionLibrary.GetInternalConditions())
                             {
                                 analyticalModel?.AddInternalCondition(internalCondition);
                             }
@@ -113,13 +113,13 @@ namespace SAM.Analytical.Revit.UI
             }
 
             List<Space> spaces = analyticalModel?.GetSpaces();
-            if(spaces == null || spaces.Count == 0)
+            if (spaces == null || spaces.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>> tuples = new List<Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>>();
-            foreach(Autodesk.Revit.DB.Mechanical.Space space_Revit in spaces_Revit)
+            foreach (Autodesk.Revit.DB.Mechanical.Space space_Revit in spaces_Revit)
             {
                 Space space = spaces.Find(x => x.ElementId() == space_Revit.Id);
                 if (space == null)
@@ -130,13 +130,13 @@ namespace SAM.Analytical.Revit.UI
                 tuples.Add(new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space, space_Revit));
             }
 
-            if(tuples.Count == 1)
+            if (tuples.Count == 1)
             {
                 using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(tuples[0].Item1), profileLibrary, analyticalModel.AdjacencyCluster))
                 {
                     if (internalConditionForm.ShowDialog() != DialogResult.OK)
                     {
-                        return Result.Cancelled;
+                        return;
                     }
 
                     tuples[0] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(internalConditionForm.Space, tuples[0].Item2);
@@ -151,15 +151,15 @@ namespace SAM.Analytical.Revit.UI
                 {
                     if (spacesForm.ShowDialog() != DialogResult.OK)
                     {
-                        return Result.Cancelled;
+                        return;
                     }
 
                     List<Space> spaces_Temp = spacesForm.Spaces?.ToList();
 
-                    for(int i =0; i < tuples.Count; i++)
+                    for (int i = 0; i < tuples.Count; i++)
                     {
                         Space space_Temp = spaces_Temp.Find(x => x.Guid == tuples[i].Item1.Guid);
-                        if(space_Temp == null)
+                        if (space_Temp == null)
                         {
                             continue;
                         }
@@ -176,12 +176,12 @@ namespace SAM.Analytical.Revit.UI
             IEnumerable<InternalCondition> internalConditions = analyticalModel?.AdjacencyCluster?.GetInternalConditions(false, true);
             if (internalConditions != null)
             {
-                if(internalConditionLibrary == null)
+                if (internalConditionLibrary == null)
                 {
                     internalConditionLibrary = new InternalConditionLibrary(analyticalModel.Name);
                 }
 
-                foreach(InternalCondition internalCondition in internalConditions)
+                foreach (InternalCondition internalCondition in internalConditions)
                 {
                     internalConditionLibrary.Add(internalCondition);
                 }
@@ -196,12 +196,12 @@ namespace SAM.Analytical.Revit.UI
                 transaction.Start();
 
                 parameter = document.ProjectInformation.LookupParameter("SAM_ProjectICs");
-                if(parameter != null && parameter.StorageType == StorageType.String)
+                if (parameter != null && parameter.StorageType == StorageType.String)
                 {
                     parameter.Set(Core.Convert.ToString(internalConditionLibrary));
                 }
 
-                foreach(Tuple<Space, Autodesk.Revit.DB.Mechanical.Space> tuple in tuples)
+                foreach (Tuple<Space, Autodesk.Revit.DB.Mechanical.Space> tuple in tuples)
                 {
                     Space space = tuple.Item1;
                     Autodesk.Revit.DB.Mechanical.Space space_Revit = tuple.Item2;
@@ -218,8 +218,6 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }

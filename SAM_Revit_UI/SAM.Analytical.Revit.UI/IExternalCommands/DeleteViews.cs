@@ -25,18 +25,18 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<View> views = new FilteredElementCollector(document).OfClass(typeof(View)).Cast<View>().ToList();
             if (views == null || views.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             for (int i = views.Count - 1; i >= 0; i--)
@@ -62,36 +62,34 @@ namespace SAM.Analytical.Revit.UI
 
             }
 
-            List<string> templateNames = new List<string>() { "00_Reference"};
+            List<string> templateNames = new List<string>() { "00_Reference" };
 
             using (Core.Windows.Forms.TreeViewForm<View> treeViewForm = new Core.Windows.Forms.TreeViewForm<View>("Select Templates", views, (View view) => view.Name, null, (View view) => !templateNames.Contains(view.Name)))
             {
                 if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
             }
 
-            if(templateNames == null || templateNames.Count == 0)
+            if (templateNames == null || templateNames.Count == 0)
             {
-                return Result.Failed;
+                return;
             }
 
             using (Transaction transaction = new Transaction(document, "Delete Views"))
             {
                 transaction.Start();
 
-                foreach(string templateName in templateNames)
+                foreach (string templateName in templateNames)
                 {
                     List<ElementId> elementIds = Core.Revit.Modify.DeleteViews(document, templateName, false, new ViewType[] { ViewType.FloorPlan });
                 }
 
                 transaction.Commit();
             }
-
-            return Result.Succeeded;
         }
     }
 }

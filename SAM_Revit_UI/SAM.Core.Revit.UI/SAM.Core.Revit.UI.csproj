@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2017' Or '$(Configuration)' == 'Release2017'">net48-windows</TargetFramework>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2018' Or '$(Configuration)' == 'Release2018'">net48-windows</TargetFramework>
-	  <TargetFramework Condition="'$(Configuration)' == 'Debug2019' Or '$(Configuration)' == 'Release2019'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">net48-windows</TargetFramework>
 	  <TargetFramework Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">net8.0-windows</TargetFramework>
-    <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
+      <TargetFramework Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">net8.0-windows</TargetFramework>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <OutputType>Library</OutputType>
@@ -18,7 +15,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <Configurations>Debug;Release;Debug2021;Debug2017;Debug2018;Debug2019;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
+    <Configurations>Debug;Release;Debug2021;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
+	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -61,19 +59,27 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2024|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\build\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Revit2024</DefineConstants>
+	<DebugSymbols>true</DebugSymbols>
+	<OutputPath>..\..\build\</OutputPath>
+	<DefineConstants>TRACE;DEBUG;Revit2024</DefineConstants>
+	<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+	<StartAction>Program</StartAction>
+	<DebugEngines>{351668CC-8477-4fbf-BFE3-5F1006E4DB1F}</DebugEngines>
+	<StartProgram>C:\Program Files\Autodesk\Revit 2024\Revit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2025|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG;Revit2025</DefineConstants>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <StartAction>Program</StartAction>
+    <DebugEngines>{351668CC-8477-4fbf-BFE3-5F1006E4DB1F}</DebugEngines>
+    <StartProgram>C:\Program Files\Autodesk\Revit 2025\Revit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug2026|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\build\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Revit2025</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Revit2026</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2024|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
@@ -87,116 +93,58 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release2026|AnyCPU'">
     <OutputPath>..\..\build\</OutputPath>
-    <DefineConstants>TRACE;Revit2025</DefineConstants>
+    <DefineConstants>TRACE;Revit2026</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">
-      <HintPath>$(SolutionDir)\references\Revit 2026\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">
-      <HintPath>$(SolutionDir)\references\Revit 2026\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2026' Or '$(Configuration)' == 'Release2026'">
-      <HintPath>$(SolutionDir)\references\Revit 2026\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
-      <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
-      <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2025' Or '$(Configuration)' == 'Release2025'">
-      <HintPath>$(SolutionDir)\references\Revit 2025\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">
-      <HintPath>$(SolutionDir)\references\Revit 2024\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">
-      <HintPath>$(SolutionDir)\references\Revit 2024\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2024' Or '$(Configuration)' == 'Release2024'">
-      <HintPath>$(SolutionDir)\references\Revit 2024\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">
-      <HintPath>$(SolutionDir)\references\Revit 2023\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">
-      <HintPath>$(SolutionDir)\references\Revit 2023\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2023' Or '$(Configuration)' == 'Release2023'">
-      <HintPath>$(SolutionDir)\references\Revit 2023\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">
-      <HintPath>$(SolutionDir)\references\Revit 2022\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">
-      <HintPath>$(SolutionDir)\references\Revit 2022\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2022' Or '$(Configuration)' == 'Release2022'">
-      <HintPath>$(SolutionDir)\references\Revit 2022\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">
-      <HintPath>$(SolutionDir)\references\Revit 2021\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">
-      <HintPath>$(SolutionDir)\references\Revit 2021\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">
-      <HintPath>$(SolutionDir)\references\Revit 2021\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">
-      <HintPath>$(SolutionDir)\references\Revit 2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">
-      <HintPath>$(SolutionDir)\references\Revit 2020\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">
-      <HintPath>$(SolutionDir)\references\Revit 2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SAM.Core, Version=1.0.8125.19527, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SAM.Core">
       <HintPath>..\..\..\SAM\build\SAM.Core.dll</HintPath>
     </Reference>
-    <Reference Include="SAM.Core.Revit">
-      <HintPath>..\..\..\SAM_Revit\build\SAM.Core.Revit.dll</HintPath>
-    </Reference>
-    <Reference Include="SAM.Core.Windows, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SAM_Windows\Framework\build\SAM.Core.Windows.dll</HintPath>
+    <Reference Include="SAM.Core.Windows">
+      <HintPath>..\..\..\SAM_Windows\build\SAM.Core.Windows.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.4" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2026'))" Version="2026.0.0" />
+    
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2025'))" Version="2025.4.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2025'))" Version="2025.4.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2025'))" Version="2025.4.0" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2025'))" Version="2025.1.0" />
+
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2024'))" Version="2024.3.10" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2024'))" Version="2024.3.10" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2024'))" Version="2024.3.10" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2024'))" Version="2024.2.0" />
+	  
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2023'))" Version="2023.1.1" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2023'))" Version="2023.1.1" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2023'))" Version="2023.1.1" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2023'))" Version="2023.3.0" />
+	  
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2022'))" Version="2022.1.21" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2022'))" Version="2022.1.21" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2022'))" Version="2022.1.21" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2022'))" Version="2022.3.0" />
+	  
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2021'))" Version="2021.1.50" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2021'))" Version="2021.1.50" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2021'))" Version="2021.1.50" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2021'))" Version="2021.3.0" />
+
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Condition="$(Configuration.EndsWith('2020'))" Version="2020.2.60" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIIFC" Condition="$(Configuration.EndsWith('2020'))" Version="2020.2.60" />
+	<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Condition="$(Configuration.EndsWith('2020'))" Version="2020.2.60" />
+	<PackageReference Include="Nice3point.Revit.Toolkit" Condition="$(Configuration.EndsWith('2020'))" Version="2020.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\SAM_Revit\SAM_Revit\SAM.Core.Revit\SAM.Core.Revit.csproj" />
-  </ItemGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <PostBuildEvent>
       if "$(Configuration)" == "Debug2020" (
@@ -226,7 +174,7 @@
       if "$(Configuration)" == "Debug2026" (
       set Version=Revit 2026
       )
-      
+
       if "$(Configuration)" == "Release2020" (
       set Version=Revit 2020
       )
@@ -258,6 +206,11 @@
       set SAM_DIR=$(APPDATA)\SAM\%25Version%25
       if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
 
-      copy "$(TargetDir)*.dll" "%25SAM_DIR%25"</PostBuildEvent>
+      Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.dll"
+      Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
+
+      copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
+      ::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -29,12 +29,12 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => typeof(AlwaysAvailableExternalCommandAvailability).FullName;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+        public override void Execute()
         {
-            Autodesk.Revit.ApplicationServices.Application application = externalCommandData?.Application?.Application;
+            Autodesk.Revit.ApplicationServices.Application application = ExternalCommandData?.Application?.Application;
             if (application == null)
             {
-                return Result.Failed;
+                return;
             }
 
             string path_Excel = null;
@@ -45,14 +45,14 @@ namespace SAM.Analytical.Revit.UI
                 openFileDialog.Title = "Select Excel file";
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
                 path_Excel = openFileDialog.FileName;
             }
 
             if (string.IsNullOrEmpty(path_Excel))
             {
-                return Result.Failed;
+                return;
             }
 
             string path_SharedParametersFile = null;
@@ -63,14 +63,14 @@ namespace SAM.Analytical.Revit.UI
                 saveFileDialog.Title = "Select Shared Parameter file";
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
                 path_SharedParametersFile = saveFileDialog.FileName;
             }
 
             if (string.IsNullOrEmpty(path_SharedParametersFile))
             {
-                return Result.Failed;
+                return;
             }
 
             System.IO.File.WriteAllText(path_SharedParametersFile, string.Empty);
@@ -158,11 +158,11 @@ namespace SAM.Analytical.Revit.UI
                                         group = "General";
 
                                     ExternalDefinition externalDefinition = sharedParameterFileWrapper.Create(group, externalDefinitionCreationOptions) as ExternalDefinition;
-                                    if(externalDefinition != null)
+                                    if (externalDefinition != null)
                                     {
                                         guids[i, 1] = externalDefinition.GUID.ToString();
                                     }
-                                    
+
                                 }
                             }
                         }
@@ -177,7 +177,6 @@ namespace SAM.Analytical.Revit.UI
 
             Core.Excel.Modify.Edit(path_Excel, "Live", func);
 
-            return Result.Succeeded;
         }
     }
 }

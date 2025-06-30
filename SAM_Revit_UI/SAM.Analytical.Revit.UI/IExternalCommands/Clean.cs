@@ -26,12 +26,13 @@ namespace SAM.Analytical.Revit.UI
 
         public override string AvailabilityClassName => null;
 
-        public override Result Execute(ExternalCommandData externalCommandData, ref string message, ElementSet elementSet)
+
+        public override void Execute()
         {
-            Document document = externalCommandData?.Application?.ActiveUIDocument?.Document;
-            if(document == null)
+            Document document = ExternalCommandData?.Application?.ActiveUIDocument?.Document;
+            if (document == null)
             {
-                return Result.Failed;
+                return;
             }
 
             List<BuiltInCategory> builtInCategories = new List<BuiltInCategory>()
@@ -62,9 +63,9 @@ namespace SAM.Analytical.Revit.UI
 #endif
             {
                 treeViewForm.CollapseAll();
-                if(treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    return Result.Cancelled;
+                    return;
                 }
 
                 elements = treeViewForm.SelectedItems;
@@ -74,9 +75,9 @@ namespace SAM.Analytical.Revit.UI
                 transaction.Start();
 
                 List<ElementId> elementIds = new List<ElementId>();
-                foreach(Element element in elements)
+                foreach (Element element in elements)
                 {
-                    if(element == null || !element.IsValidObject)
+                    if (element == null || !element.IsValidObject)
                     {
                         continue;
                     }
@@ -85,7 +86,7 @@ namespace SAM.Analytical.Revit.UI
                     {
                         document.Delete(element.Id);
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         elementIds.Add(element.Id);
                     }
@@ -93,8 +94,6 @@ namespace SAM.Analytical.Revit.UI
 
                 transaction.Commit();
             }
-
-                return Result.Succeeded;
         }
     }
 }
