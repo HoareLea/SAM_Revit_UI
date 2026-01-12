@@ -33,8 +33,8 @@ Welcome — and let’s keep the open-source journey going. 🤝
 
 ## Installing
 
-To install **SAM**, download and run the  
-[latest Windows installer](https://github.com/HoareLea/SAM_Deploy/releases).
+To install **SAM** using the Windows installer, download and run the  
+[latest installer](https://github.com/SAM-BIM/SAM_Deploy/releases/latest).
 
 The installer will deploy the required SAM components,
 including the **SAM_Revit_UI add-in**, for supported Revit versions.
@@ -53,7 +53,7 @@ setup instructions, and usage examples for the Revit UI workflows:
 ## Resources
 - 🧠 **SAM Core:** https://github.com/SAM-BIM/SAM  
 - 🧩 **SAM_Revit:** https://github.com/SAM-BIM/SAM_Revit  
-- 🧰 **SAM Installer:** https://github.com/HoareLea/SAM_Deploy/releases  
+- 🧰 **SAM Installer:** https://github.com/SAM-BIM/SAM_Deploy/releases/latest  
 
 ---
 
