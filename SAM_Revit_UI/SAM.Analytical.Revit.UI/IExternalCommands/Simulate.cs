@@ -227,7 +227,7 @@ namespace SAM.Analytical.Revit.UI
                 SimulateTo = 1
             };
 
-            analyticalModel = Analytical.UI.WPF.Modify.RunWorkflow(analyticalModel, workflowSettings);
+            analyticalModel = Tas.Modify.RunWorkflow(analyticalModel, workflowSettings);
 
             List<Core.ISAMObject> results = null;
 
