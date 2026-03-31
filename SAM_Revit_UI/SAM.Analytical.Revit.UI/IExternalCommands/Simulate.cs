@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020–2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -224,7 +227,7 @@ namespace SAM.Analytical.Revit.UI
                 SimulateTo = 1
             };
 
-            analyticalModel = Tas.Modify.RunWorkflow(analyticalModel, workflowSettings);
+            analyticalModel = Analytical.UI.WPF.Modify.RunWorkflow(analyticalModel, workflowSettings);
 
             List<Core.ISAMObject> results = null;
 
