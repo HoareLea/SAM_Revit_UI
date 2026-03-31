@@ -205,10 +205,18 @@ jobs:
           Restore-Build 'SAM_Revit'    'Release2025'
           Restore-Build 'SAM_Revit_UI' 'Release2025'
 
+          function Copy-FolderContents([string]$src, [string]$dst) {
+            if (-not (Test-Path $src)) {
+              throw "Source folder not found: $src"
+            }
+            New-Item -ItemType Directory -Force -Path $dst | Out-Null
+            Copy-Item (Join-Path $src '*') $dst -Recurse -Force
+          }
+
           $out = "_ci_artifacts\Revit 2025"
           New-Item -ItemType Directory -Force -Path $out | Out-Null
-          Copy-Item "SAM_Revit\build\*"    (Join-Path $out "SAM_Revit")    -Recurse -Force
-          Copy-Item "SAM_Revit_UI\build\*" (Join-Path $out "SAM_Revit_UI") -Recurse -Force
+          Copy-FolderContents "SAM_Revit\build"    (Join-Path $out "SAM_Revit")
+          Copy-FolderContents "SAM_Revit_UI\build" (Join-Path $out "SAM_Revit_UI")
 
           if (-not (Test-Path (Join-Path $out "SAM_Revit_UI\SAM.Revit.UI.dll"))) {
             throw "Revit 2025 snapshot is missing SAM.Revit.UI.dll"
@@ -265,10 +273,18 @@ jobs:
           Restore-Build 'SAM_Revit'    'Release2026'
           Restore-Build 'SAM_Revit_UI' 'Release2026'
 
+          function Copy-FolderContents([string]$src, [string]$dst) {
+            if (-not (Test-Path $src)) {
+              throw "Source folder not found: $src"
+            }
+            New-Item -ItemType Directory -Force -Path $dst | Out-Null
+            Copy-Item (Join-Path $src '*') $dst -Recurse -Force
+          }
+
           $out = "_ci_artifacts\Revit 2026"
           New-Item -ItemType Directory -Force -Path $out | Out-Null
-          Copy-Item "SAM_Revit\build\*"    (Join-Path $out "SAM_Revit")    -Recurse -Force
-          Copy-Item "SAM_Revit_UI\build\*" (Join-Path $out "SAM_Revit_UI") -Recurse -Force
+          Copy-FolderContents "SAM_Revit\build"    (Join-Path $out "SAM_Revit")
+          Copy-FolderContents "SAM_Revit_UI\build" (Join-Path $out "SAM_Revit_UI")
 
           if (-not (Test-Path (Join-Path $out "SAM_Revit_UI\SAM.Revit.UI.dll"))) {
             throw "Revit 2026 snapshot is missing SAM.Revit.UI.dll"
