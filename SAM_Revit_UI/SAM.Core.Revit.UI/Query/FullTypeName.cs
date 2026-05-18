@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020–2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using System.Text.Json.Nodes;
 using System;
 using System.Collections.Generic;
 
@@ -6,12 +8,12 @@ namespace SAM.Core.Revit.UI
 {
     public static partial class Query
     {
-        public static string FullTypeName(this JObject jObject)
+        public static string FullTypeName(this JsonObject jObject)
         {
             if (jObject == null)
                 return null;
 
-            return jObject.Value<string>("_type");
+            return jObject["_type"]?.GetValue<string>() ?? default(string);
         }
 
         public static string FullTypeName(Type type)
