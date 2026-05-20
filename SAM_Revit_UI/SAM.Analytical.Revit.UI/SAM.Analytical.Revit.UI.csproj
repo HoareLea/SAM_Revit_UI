@@ -150,7 +150,7 @@
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
         <PackageReference Include="NetTopologySuite" Version="2.6.0" />
-        <PackageReference Include="System.Text.Json" Version="10.0.8" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
 	  
         <Reference Include="RevitAPIUI">
             <HintPath>$(SolutionDir)\references\Revit $(RevitYear)\RevitAPIUI.dll</HintPath>
