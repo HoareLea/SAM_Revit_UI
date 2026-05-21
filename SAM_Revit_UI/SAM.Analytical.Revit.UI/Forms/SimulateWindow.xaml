@@ -1,0 +1,35 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:wpf="clr-namespace:SAM.Analytical.UI.WPF;assembly=SAM.Analytical.UI.WPF"
+    x:Class="SAM.Analytical.Revit.UI.Forms.SimulateWindow"
+    mc:Ignorable="d"
+    Title="Simulate"
+    Width="520" SizeToContent="Height"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Shared SimulateControl from SAM.Analytical.UI.WPF -->
+        <wpf:SimulateControl x:Name="simulateControl" Grid.Row="0" Margin="0,0,0,8"/>
+
+        <!-- Revit-specific: Geometry Calculation Method -->
+        <Label Grid.Row="1" Content="Geometry Calculation Method:" Margin="0,0,0,2"/>
+        <ComboBox x:Name="comboBox_GeometryCalculationMethod" Grid.Row="2" Margin="0,0,0,12"/>
+
+        <!-- OK / Cancel -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="button_OK" Content="OK" Width="80" Margin="0,0,8,0" Click="button_OK_Click"/>
+            <Button x:Name="button_Cancel" Content="Cancel" Width="80" Click="button_Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
