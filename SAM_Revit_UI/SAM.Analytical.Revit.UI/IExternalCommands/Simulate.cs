@@ -81,24 +81,26 @@ namespace SAM.Analytical.Revit.UI
             bool updateConstructionLayersByPanelType = false;
             bool printRoomDataSheets = false;
 
-            using (Forms.SimulateForm simulateForm = new Forms.SimulateForm(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path)))
+            Forms.SimulateWindow simulateWindow = new Forms.SimulateWindow(System.IO.Path.GetFileNameWithoutExtension(path), System.IO.Path.GetDirectoryName(path));
             {
                 Parameter parameter = document.ProjectInformation.LookupParameter("SAM_WeatherFile");
-                simulateForm.WeatherData = Core.Convert.ToSAM<WeatherData>(parameter?.AsString())?.FirstOrDefault();
+                simulateWindow.WeatherData = Core.Convert.ToSAM<WeatherData>(parameter?.AsString())?.FirstOrDefault();
 
-                if (simulateForm.ShowDialog() != DialogResult.OK)
+                new System.Windows.Interop.WindowInteropHelper(simulateWindow).Owner = commandData.Application.MainWindowHandle;
+
+                if (simulateWindow.ShowDialog() != true)
                 {
                     return Result.Cancelled;
                 }
 
-                projectName = simulateForm.ProjectName;
-                outputDirectory = simulateForm.OutputDirectory;
-                unmetHours = simulateForm.UnmetHours;
-                weatherData = simulateForm.WeatherData;
-                solarCalculationMethod = simulateForm.SolarCalculationMethod;
-                geometryCalculationMethod = simulateForm.GeometryCalculationMethod;
-                updateConstructionLayersByPanelType = simulateForm.UpdateConstructionLayersByPanelType;
-                printRoomDataSheets = simulateForm.RoomDataSheets;
+                projectName = simulateWindow.ProjectName;
+                outputDirectory = simulateWindow.OutputDirectory;
+                unmetHours = simulateWindow.UnmetHours;
+                weatherData = simulateWindow.WeatherData;
+                solarCalculationMethod = simulateWindow.SolarCalculationMethod;
+                geometryCalculationMethod = simulateWindow.GeometryCalculationMethod;
+                updateConstructionLayersByPanelType = simulateWindow.UpdateConstructionLayersByPanelType;
+                printRoomDataSheets = simulateWindow.RoomDataSheets;
             }
 
             Stopwatch stopwatch = new Stopwatch();
