@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020–2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace SAM.Analytical.Revit.UI
 {
@@ -27,25 +29,38 @@ namespace SAM.Analytical.Revit.UI
                 dynamic @dynamic = new ExpandoObject();
                 dynamic.Name = name;
                 dynamic.Group = parameterGroup;
-                dynamic.Checked = unselectedParameterGroups != null ? unselectedParameterGroups.Contains(parameterGroup) : true;
+                dynamic.Checked = unselectedParameterGroups != null ? !unselectedParameterGroups.Contains(parameterGroup) : true;
 
                 dynamics.Add(dynamic);
             }
 
             dynamics.Sort((x, y) => (x.Group + x.Name).CompareTo(y.Group + y.Name));
 
-            using (Core.Windows.Forms.TreeViewForm<dynamic> treeViewForm = new Core.Windows.Forms.TreeViewForm<dynamic>("Select Parameters", dynamics, (dynamic @dynamic) => dynamic.Name, (dynamic @dynamic) => dynamic.Group, (dynamic @dynamic) => dynamic.Checked))
+            // No CollapseAll equivalent is needed: a WPF TreeViewItem starts collapsed, which is what the
+            // WinForms tree had to be told to do. No owner is set either - unlike the IExternalCommands,
+            // this is a plain extension method with no ExternalCommandData to take a window handle from.
+            Core.UI.WPF.MultipleSelectionTreeViewWindow treeViewWindow = new Core.UI.WPF.MultipleSelectionTreeViewWindow
             {
-                treeViewForm.CollapseAll();
-                treeViewForm.Size = new System.Drawing.Size(430, 850);
+                Title = "Select Parameters",
+                Width = 430,
+                Height = 850
+            };
 
-                if (treeViewForm.ShowDialog() != DialogResult.OK)
-                {
-                    return null;
-                }
+            treeViewWindow.GettingText += (object sender, Core.UI.WPF.GettingTextEventArgs e) => e.Text = (e?.Object as dynamic)?.Name as string;
+            treeViewWindow.GettingCategory += (object sender, Core.UI.WPF.GettingCategoryEventArgs e) =>
+            {
+                string category = (e?.Object as dynamic)?.Group as string;
+                e.Category = string.IsNullOrEmpty(category) ? null : new Core.Category(category);
+            };
+            treeViewWindow.GettingChecked += (object sender, Core.UI.WPF.GettingCheckedEventArgs e) => e.Checked = (e?.Object as dynamic)?.Checked == true;
+            treeViewWindow.SetObjects(dynamics);
 
-                return treeViewForm?.SelectedItems?.ConvertAll(x => x.Name as string);
+            if (treeViewWindow.ShowDialog() != true)
+            {
+                return null;
             }
+
+            return treeViewWindow.GetObjects<ExpandoObject>()?.ConvertAll(x => ((dynamic)x).Name as string);
         }
     }
 }

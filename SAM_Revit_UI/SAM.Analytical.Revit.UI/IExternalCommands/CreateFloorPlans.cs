@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -41,19 +43,16 @@ namespace SAM.Analytical.Revit.UI
             }
 
             ViewPlan viewPlan = null;
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-            using (Core.Windows.Forms.ComboBoxForm<ViewPlan> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.IntegerValue == 312)))
-#else
-            using (Core.Windows.Forms.ComboBoxForm<ViewPlan> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.Value == 312)))
-#endif
-            {
-                if (comboBoxForm.ShowDialog() != DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+            Core.UI.WPF.ComboBoxWindow<ViewPlan> comboBoxWindow = new Core.UI.WPF.ComboBoxWindow<ViewPlan>("Select ViewPlan", viewPlans, (ViewPlan x) => x.Name, viewPlans.Find(x => x.Id.Value == 312));
 
-                viewPlan = comboBoxForm.SelectedItem;
+            new System.Windows.Interop.WindowInteropHelper(comboBoxWindow).Owner = commandData.Application.MainWindowHandle;
+
+            if (comboBoxWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            viewPlan = comboBoxWindow.SelectedItem;
 
             if (viewPlan == null)
             {

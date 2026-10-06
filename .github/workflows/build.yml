@@ -1,4 +1,4 @@
-name: Build (Windows) - SAM_Revit_UI (2025/2026)
+name: Build (Windows) - SAM_Revit_UI (2025/2026/2027)
 
 on:
   push:
@@ -17,6 +17,12 @@ jobs:
       ORG_NAME: "SAM-BIM"
       REPO_NAME: "SAM_Revit_UI"
       NUGET_XMLDOC_MODE: "skip"
+      # The native OCCT layer (vcpkg/OpenCASCADE) is not available on the runner, so
+      # skip build-native.ps1 and build SAM_OCCT's managed assemblies only. Mirrors
+      # SAM_OCCT's own build workflow. The Revit post-build steps that copy the native
+      # kernel are 'if exist' guarded, so the plug-in still links against the managed
+      # OCCT assemblies here; the shipped native binaries come from SAM_Deploy.
+      SAM_OCCT_SKIP_NATIVE_BUILD: "true"
 
     steps:
       - name: Checkout SAM_Revit_UI
@@ -28,8 +34,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.x"
-
+          dotnet-version: |
+            8.x
+            10.x
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -85,18 +92,27 @@ jobs:
 
           $deps = @(
             'SAM'
-            'SAM_Systems'
             'SAM_Psychrometrics'
             'SAM_Mollier'
+            'SAM_Systems'
             'SAM_Windows'
             'SAM_IFC'
-            'SAM_Topologic'
             'SAM_BHom'
             'SAM_gbXML'
             'SAM_GEM'
             'SAM_LadybugTools'
             'SAM_Solver'
+            # Replaces SAM_Topologic: SAM.Analytical.Revit.UI now references
+            # SAM_OCCT\build\SAM.{Core,Geometry,Analytical}.OCCT.dll instead of the
+            # Topologic assemblies, and no repo in this list references SAM_Topologic
+            # any more. Must follow SAM and SAM_Solver - its only sibling dependencies.
+            'SAM_OCCT'
             'SAM_SolarCalculator'
+            # Must precede SAM_Tas and SAM_OpenStudio: both benchmark producers reference
+            # SAM_Validation\build\SAM.Analytical.Benchmark.dll by HintPath, and without it they fail
+            # CS0234. Same slot as BuildAlls_v4.csproj uses locally. Needs only SAM and SAM_Mollier,
+            # both already above.
+            'SAM_Validation'
             'SAM_Tas'
             'SAM_Excel'
             'SAM_SQLite'
@@ -164,18 +180,26 @@ jobs:
 
           $orderedRepos = @(
             'SAM'
-            'SAM_Systems'
             'SAM_Psychrometrics'
             'SAM_Mollier'
+            'SAM_Systems'
             'SAM_Windows'
             'SAM_IFC'
-            'SAM_Topologic'
             'SAM_BHom'
             'SAM_gbXML'
             'SAM_GEM'
             'SAM_LadybugTools'
             'SAM_Solver'
+            # Replaces SAM_Topologic - see the clone list above for why. Emits
+            # SAM_OCCT\build\SAM.{Core,Geometry,Analytical}.OCCT.dll, which
+            # SAM.Analytical.Revit.UI references by HintPath.
+            'SAM_OCCT'
             'SAM_SolarCalculator'
+            # Must precede SAM_Tas and SAM_OpenStudio: both benchmark producers reference
+            # SAM_Validation\build\SAM.Analytical.Benchmark.dll by HintPath, and without it they fail
+            # CS0234. Same slot as BuildAlls_v4.csproj uses locally. Needs only SAM and SAM_Mollier,
+            # both already above.
+            'SAM_Validation'
             'SAM_Tas'
             'SAM_Excel'
             'SAM_SQLite'
@@ -351,6 +375,75 @@ jobs:
 
           if (-not (Test-Path (Join-Path $out "SAM_Revit_UI\SAM.Revit.UI.dll"))) {
             throw "Revit 2026 snapshot is missing SAM.Revit.UI.dll"
+          }
+
+      - name: Clean Revit build folders before 2027
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($p in @('SAM_Revit\build','SAM_Revit_UI\build')) {
+            if (Test-Path $p) { Remove-Item $p -Recurse -Force }
+            New-Item -ItemType Directory -Force -Path $p | Out-Null
+          }
+
+      - name: Build Revit 2027 and snapshot outputs
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          function Find-Solution([string]$repoName) {
+            $expected = Join-Path $repoName "$repoName.sln"
+            if (Test-Path $expected) { return (Resolve-Path $expected).Path }
+
+            $rootSln = Get-ChildItem -Path $repoName -Filter *.sln -File -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($rootSln) { return $rootSln.FullName }
+
+            $anySln = Get-ChildItem -Path $repoName -Recurse -Filter *.sln -File -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -notmatch '\\(bin|obj|packages)\\' } |
+                      Select-Object -First 1
+            if ($anySln) { return $anySln.FullName }
+
+            throw "No .sln found under: $repoName"
+          }
+
+          function Restore-Build([string]$repoName, [string]$cfg) {
+            $sln = Find-Solution $repoName
+            $args = @(
+              '/m:1'
+              '/nr:false'
+              '/v:m'
+              '/p:UseSharedCompilation=false'
+              '/p:SAMVersion=${{ steps.ver.outputs.samversion }}'
+              '/p:RunPostBuildEvent=OnOutputUpdated'
+              "/p:Configuration=$cfg"
+              '/p:Platform=Any CPU'
+            )
+
+            & msbuild $sln /t:Restore @args
+            if ($LASTEXITCODE -ne 0) { throw "MSBuild restore failed: $repoName ($cfg)" }
+
+            & msbuild $sln /t:Rebuild @args
+            if ($LASTEXITCODE -ne 0) { throw "MSBuild rebuild failed: $repoName ($cfg)" }
+          }
+
+          Restore-Build 'SAM_Revit'    'Release2027'
+          Restore-Build 'SAM_Revit_UI' 'Release2027'
+
+          function Copy-FolderContents([string]$src, [string]$dst) {
+            if (-not (Test-Path $src)) {
+              throw "Source folder not found: $src"
+            }
+            New-Item -ItemType Directory -Force -Path $dst | Out-Null
+            Copy-Item (Join-Path $src '*') $dst -Recurse -Force
+          }
+
+          $out = "_ci_artifacts\Revit 2027"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          Copy-FolderContents "SAM_Revit\build"    (Join-Path $out "SAM_Revit")
+          Copy-FolderContents "SAM_Revit_UI\build" (Join-Path $out "SAM_Revit_UI")
+
+          if (-not (Test-Path (Join-Path $out "SAM_Revit_UI\SAM.Revit.UI.dll"))) {
+            throw "Revit 2027 snapshot is missing SAM.Revit.UI.dll"
           }
 
       - name: Upload isolated Revit build outputs

@@ -58,10 +58,27 @@ namespace SAM.Analytical.Revit.UI.Forms
             get => simulateControl.ProjectName;
         }
 
+        /// <summary>
+        /// Seeds the combo box with weather data already known to the caller — for this window, whatever the
+        /// document's SAM_WeatherFile parameter holds. Set it; do NOT read it back to find out what the user
+        /// chose, because it only ever returns the seeded entry: its getter looks the item up by the fixed
+        /// internal key, so anything the user picked from disk is invisible to it. Read
+        /// <see cref="SelectedWeatherData"/> instead.
+        /// </summary>
         public WeatherData WeatherData
         {
             get => simulateControl.WeatherData;
             set => simulateControl.WeatherData = value;
+        }
+
+        /// <summary>
+        /// What the user actually has selected — the seeded entry, or a file they browsed to. This is the one
+        /// to read after the dialog closes. Mirrors SAM.Analytical.UI.WPF's own SimulateWindow, which has
+        /// always had both and reads this one.
+        /// </summary>
+        public WeatherData SelectedWeatherData
+        {
+            get => simulateControl.SelectedWeatherData;
         }
 
         public bool UnmetHours
@@ -120,7 +137,10 @@ namespace SAM.Analytical.Revit.UI.Forms
                 return;
             }
 
-            if (simulateControl.WeatherData == null)
+            // SelectedWeatherData, not WeatherData: the latter only sees the entry seeded from the document's
+            // SAM_WeatherFile parameter, so on a model that has never been simulated this rejected every .epw
+            // the user picked and there was no way past it.
+            if (simulateControl.SelectedWeatherData == null)
             {
                 MessageBox.Show("Provide Weather Data");
                 return;

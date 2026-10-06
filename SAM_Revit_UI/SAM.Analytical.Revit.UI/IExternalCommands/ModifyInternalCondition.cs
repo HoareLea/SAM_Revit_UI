@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -6,7 +8,6 @@ using SAM.Core.Revit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
 namespace SAM.Analytical.Revit.UI
@@ -130,47 +131,64 @@ namespace SAM.Analytical.Revit.UI
                 tuples.Add(new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space, space_Revit));
             }
 
+            // The WinForms forms took ProfileLibrary/AdjacencyCluster as separate constructor arguments;
+            // the WPF windows take a single AnalyticalModel. profileLibrary here is the (possibly
+            // DefaultProfileLibrary()-substituted) library selected above, which can differ from
+            // analyticalModel.ProfileLibrary - folding it into a model preserves that distinction.
+            AnalyticalModel analyticalModel_Dialog = new AnalyticalModel(analyticalModel, analyticalModel.AdjacencyCluster, analyticalModel.MaterialLibrary, profileLibrary);
+
             if (tuples.Count == 1)
             {
-                using (Windows.Forms.InternalConditionForm internalConditionForm = new Windows.Forms.InternalConditionForm(new Space(tuples[0].Item1), profileLibrary, analyticalModel.AdjacencyCluster))
+                Analytical.UI.WPF.InternalConditionWindow internalConditionWindow = new Analytical.UI.WPF.InternalConditionWindow(analyticalModel_Dialog, new Space(tuples[0].Item1));
+
+                new System.Windows.Interop.WindowInteropHelper(internalConditionWindow).Owner = externalCommandData.Application.MainWindowHandle;
+
+                if (internalConditionWindow.ShowDialog() != true)
                 {
-                    if (internalConditionForm.ShowDialog() != DialogResult.OK)
-                    {
-                        return Result.Cancelled;
-                    }
-
-                    tuples[0] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(internalConditionForm.Space, tuples[0].Item2);
-                    profileLibrary = internalConditionForm.ProfileLibrary;
-
-                    analyticalModel = new AnalyticalModel(analyticalModel, internalConditionForm.AdjacencyCluster);
+                    return Result.Cancelled;
                 }
+
+                tuples[0] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(internalConditionWindow.Space, tuples[0].Item2);
+                profileLibrary = internalConditionWindow.ProfileLibrary;
+
+                // Was the 2-argument AnalyticalModel(analyticalModel, adjacencyCluster) constructor,
+                // which keeps analyticalModel's OWN (pre-dialog) ProfileLibrary rather than the one just
+                // read back above - profileLibrary was reassigned but never actually consumed again.
+                // Using the 4-argument constructor here is the fix: it is what makes the
+                // ProfileLibrary/AdjacencyCluster getters added to InternalConditionWindow for this
+                // migration actually take effect, matching the pattern InternalConditionControl and
+                // SpacesWindow themselves use internally.
+                analyticalModel = new AnalyticalModel(analyticalModel, internalConditionWindow.AdjacencyCluster, analyticalModel.MaterialLibrary, profileLibrary);
             }
             else
             {
-                using (Windows.Forms.SpacesForm spacesForm = new Windows.Forms.SpacesForm(tuples.ConvertAll(x => x.Item1), analyticalModel.AdjacencyCluster, profileLibrary))
+                Analytical.UI.WPF.SpacesWindow spacesWindow = new Analytical.UI.WPF.SpacesWindow(tuples.ConvertAll(x => x.Item1), analyticalModel_Dialog);
+
+                new System.Windows.Interop.WindowInteropHelper(spacesWindow).Owner = externalCommandData.Application.MainWindowHandle;
+
+                if (spacesWindow.ShowDialog() != true)
                 {
-                    if (spacesForm.ShowDialog() != DialogResult.OK)
-                    {
-                        return Result.Cancelled;
-                    }
-
-                    List<Space> spaces_Temp = spacesForm.Spaces?.ToList();
-
-                    for (int i = 0; i < tuples.Count; i++)
-                    {
-                        Space space_Temp = spaces_Temp.Find(x => x.Guid == tuples[i].Item1.Guid);
-                        if (space_Temp == null)
-                        {
-                            continue;
-                        }
-
-                        tuples[i] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space_Temp, tuples[i].Item2);
-                    }
-
-                    profileLibrary = spacesForm.ProfileLibrary;
-
-                    analyticalModel = new AnalyticalModel(analyticalModel, spacesForm.AdjacencyCluster);
+                    return Result.Cancelled;
                 }
+
+                List<Space> spaces_Temp = spacesWindow.Spaces?.ToList();
+
+                for (int i = 0; i < tuples.Count; i++)
+                {
+                    Space space_Temp = spaces_Temp.Find(x => x.Guid == tuples[i].Item1.Guid);
+                    if (space_Temp == null)
+                    {
+                        continue;
+                    }
+
+                    tuples[i] = new Tuple<Space, Autodesk.Revit.DB.Mechanical.Space>(space_Temp, tuples[i].Item2);
+                }
+
+                profileLibrary = spacesWindow.ProfileLibrary;
+
+                // Same fix as the single-space branch above - 4-argument constructor so the edited
+                // ProfileLibrary actually propagates instead of being silently discarded.
+                analyticalModel = new AnalyticalModel(analyticalModel, spacesWindow.AdjacencyCluster, analyticalModel.MaterialLibrary, profileLibrary);
             }
 
             IEnumerable<InternalCondition> internalConditions = analyticalModel?.AdjacencyCluster?.GetInternalConditions(false, true);

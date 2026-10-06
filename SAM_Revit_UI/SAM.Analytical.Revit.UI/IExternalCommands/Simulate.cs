@@ -96,7 +96,9 @@ namespace SAM.Analytical.Revit.UI
                 projectName = simulateWindow.ProjectName;
                 outputDirectory = simulateWindow.OutputDirectory;
                 unmetHours = simulateWindow.UnmetHours;
-                weatherData = simulateWindow.WeatherData;
+                // SelectedWeatherData, not WeatherData - see the note on those properties. This is the same
+                // pairing SAM.Analytical.UI.WPF.Modify.Simulate uses: seed with one, read back the other.
+                weatherData = simulateWindow.SelectedWeatherData;
                 solarCalculationMethod = simulateWindow.SolarCalculationMethod;
                 geometryCalculationMethod = simulateWindow.GeometryCalculationMethod;
                 updateConstructionLayersByPanelType = simulateWindow.UpdateConstructionLayersByPanelType;
@@ -118,81 +120,154 @@ namespace SAM.Analytical.Revit.UI
             string path_TBD = System.IO.Path.Combine(outputDirectory, projectName + ".tbd");
 
             Dictionary<Guid, ElementId> dictionary = null;
-            using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Preparing Model", 6))
+            bool cancelled_Preparation = false;
+
+            // The dialog runs on its own UI thread (ProgressWindowHost) because "Converting to TBD" and
+            // "Updating Shading" block this one for minutes, and Windows discards clicks on a window whose
+            // thread has stopped pumping - a Cancel button on Revit's own thread would lose the click and the
+            // run would carry on regardless. The work itself stays here, so no TAS COM object changes apartment
+            // and no Revit API call leaves the API thread. Cancellation is observed only BETWEEN COM calls; an
+            // in-flight TAS COM call is never interrupted.
+            using (System.Threading.CancellationTokenSource cancellationTokenSource = new System.Threading.CancellationTokenSource())
             {
-                progressForm.Update("Converting Model");
-                analyticalModel = Convert.ToSAM(document, geometryCalculationMethod, out dictionary);
+                // The dialog is deliberately not a using: it has to be torn down BEFORE the final cancellation
+                // check below, and a using would dispose it after. Its Cancel button lives on the dialog's own
+                // thread, so a click can land at any instant - checking and then disposing would only move the
+                // race. Dispose closes the window and joins its thread, so once it returns no further
+                // CancelRequested can arrive and any in-flight one has already run. Same ordering as
+                // Modify.RunWorkflow.
+                //
+                // No owner is set, unlike every other window this command opens over Revit. A WPF owner must
+                // live on the same thread as the window it owns, and this one deliberately does not - that is
+                // the whole point of the host. ProgressWindowHost sets Topmost instead, which is what keeps it
+                // in front of a Revit window that has stopped painting.
+                Core.Windows.WPF.ProgressWindowHost progressWindowHost = new Core.Windows.WPF.ProgressWindowHost("Preparing Model", 6, true, Analytical.Tas.Query.CancelNote(null));
 
-                if (analyticalModel == null)
+                try
                 {
-                    MessageBox.Show("Could not convert to AnalyticalModel");
-                    return Result.Cancelled;
-                }
+                    progressWindowHost.CancelRequested += (s, e) => cancellationTokenSource.Cancel();
 
-                IEnumerable<Core.IMaterial> materials = Analytical.Query.Materials(analyticalModel.AdjacencyCluster, Analytical.Query.DefaultMaterialLibrary());
-                if (materials != null)
-                {
-                    foreach (Core.IMaterial material in materials)
+                    progressWindowHost.Update("Converting Model");
+                    analyticalModel = Convert.ToSAM(document, geometryCalculationMethod, out dictionary);
+
+                    if (analyticalModel == null)
                     {
-                        if (analyticalModel.HasMaterial(material))
+                        MessageBox.Show("Could not convert to AnalyticalModel");
+                        return Result.Cancelled;
+                    }
+
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                    IEnumerable<Core.IMaterial> materials = Analytical.Query.Materials(analyticalModel.AdjacencyCluster, Analytical.Query.DefaultMaterialLibrary());
+                    if (materials != null)
+                    {
+                        foreach (Core.IMaterial material in materials)
                         {
-                            continue;
+                            if (analyticalModel.HasMaterial(material))
+                            {
+                                continue;
+                            }
+
+                            analyticalModel.AddMaterial(material);
+                        }
+                    }
+
+                    analyticalModel = updateConstructionLayersByPanelType ? analyticalModel.UpdateConstructionLayersByPanelType() : analyticalModel;
+
+                    // Immediately before the delete, not merely at the next stage boundary: cancelling while the
+                    // materials loop or UpdateConstructionLayersByPanelType was running would otherwise still
+                    // erase the user's existing .tbd on the way out, then report the run as cancelled.
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                    if (System.IO.File.Exists(path_TBD))
+                    {
+                        System.IO.File.Delete(path_TBD);
+                    }
+
+                    List<int> hoursOfYear = Analytical.Query.DefaultHoursOfYear();
+
+                    //Run Solar Calculation for cooling load
+
+                    progressWindowHost.Update("Solar Calculations");
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                    if (solarCalculationMethod != SolarCalculationMethod.None)
+                    {
+                        SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), false, Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
+                    }
+
+                    using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
+                    {
+                        TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
+
+                        progressWindowHost.Update("Updating WeatherData");
+                        cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData, analyticalModel == null ? 0 : analyticalModel.AdjacencyCluster.BuildingHeight());
+
+                        TBD.Calendar calendar = tBDDocument.Building.GetCalendar();
+
+                        List<TBD.dayType> dayTypes = Query.DayTypes(calendar);
+                        if (dayTypes.Find(x => x.name == "HDD") == null)
+                        {
+                            TBD.dayType dayType = calendar.AddDayType();
+                            dayType.name = "HDD";
                         }
 
-                        analyticalModel.AddMaterial(material);
-                    }
-                }
+                        if (dayTypes.Find(x => x.name == "CDD") == null)
+                        {
+                            TBD.dayType dayType = calendar.AddDayType();
+                            dayType.name = "CDD";
+                        }
 
-                analyticalModel = updateConstructionLayersByPanelType ? analyticalModel.UpdateConstructionLayersByPanelType() : analyticalModel;
+                        progressWindowHost.Note = Analytical.Tas.Query.CancelNote("Converting to TBD");
+                        progressWindowHost.Update("Converting to TBD");
+                        cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        Tas.Convert.ToTBD(analyticalModel, tBDDocument);
+                        progressWindowHost.Note = Analytical.Tas.Query.CancelNote(null);
 
-                if (System.IO.File.Exists(path_TBD))
-                {
-                    System.IO.File.Delete(path_TBD);
-                }
+                        progressWindowHost.Update("Updating Zones");
+                        cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        Tas.Modify.UpdateZones(tBDDocument.Building, analyticalModel, true);
 
-                List<int> hoursOfYear = Analytical.Query.DefaultHoursOfYear();
+                        progressWindowHost.Note = Analytical.Tas.Query.CancelNote("Updating Shading");
+                        progressWindowHost.Update("Updating Shading");
+                        cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        simulate = Tas.Modify.UpdateShading(tBDDocument, analyticalModel);
+                        progressWindowHost.Note = Analytical.Tas.Query.CancelNote(null);
 
-                //Run Solar Calculation for cooling load
-
-                progressForm.Update("Solar Calculations");
-                if (solarCalculationMethod != SolarCalculationMethod.None)
-                {
-                    SolarCalculator.Modify.Simulate(analyticalModel, hoursOfYear.ConvertAll(x => new DateTime(2018, 1, 1).AddHours(x)), false, Core.Tolerance.MacroDistance, Core.Tolerance.MacroDistance, 0.012, Core.Tolerance.Distance);
-                }
-
-                using (SAMTBDDocument sAMTBDDocument = new SAMTBDDocument(path_TBD))
-                {
-                    TBD.TBDDocument tBDDocument = sAMTBDDocument.TBDDocument;
-
-                    progressForm.Update("Updating WeatherData");
-                    Weather.Tas.Modify.UpdateWeatherData(tBDDocument, weatherData, analyticalModel == null ? 0 : analyticalModel.AdjacencyCluster.BuildingHeight());
-
-                    TBD.Calendar calendar = tBDDocument.Building.GetCalendar();
-
-                    List<TBD.dayType> dayTypes = Query.DayTypes(calendar);
-                    if (dayTypes.Find(x => x.name == "HDD") == null)
-                    {
-                        TBD.dayType dayType = calendar.AddDayType();
-                        dayType.name = "HDD";
+                        sAMTBDDocument.Save();
                     }
 
-                    if (dayTypes.Find(x => x.name == "CDD") == null)
-                    {
-                        TBD.dayType dayType = calendar.AddDayType();
-                        dayType.name = "CDD";
-                    }
-
-                    progressForm.Update("Converting to TBD");
-                    Tas.Convert.ToTBD(analyticalModel, tBDDocument);
-
-                    progressForm.Update("Updating Zones");
-                    Tas.Modify.UpdateZones(tBDDocument.Building, analyticalModel, true);
-
-                    progressForm.Update("Updating Shading");
-                    simulate = Tas.Modify.UpdateShading(tBDDocument, analyticalModel);
-
-                    sAMTBDDocument.Save();
                 }
+                catch (OperationCanceledException)
+                {
+                    // Reported after the block so the dialog is gone before the message box appears.
+                    cancelled_Preparation = true;
+                }
+                finally
+                {
+                    progressWindowHost.Dispose();
+                }
+
+                // Past this point no cancel can be raised, so this observation is final - and it is the only one
+                // that covers the last stage. Checking on the way INTO each stage leaves "Updating Shading"
+                // uncovered, which is the longest stage here and the one the note tells the user to expect to
+                // wait through: a click there was recorded by the dialog and never observed, so the workflow
+                // started anyway. The document has already been saved by now, so nothing is left half-written.
+                //
+                // "Final" holds only once the host confirms it shut down cleanly. If it could not - the dialog
+                // thread was not joined, or a handler did not quiesce - that thread is still live and a click it
+                // has queued may never have been observed, so success cannot be claimed and the safe direction
+                // is to report the preparation as cancelled.
+                if (!cancelled_Preparation && (cancellationTokenSource.IsCancellationRequested || !progressWindowHost.ShutdownCompleted))
+                {
+                    cancelled_Preparation = true;
+                }
+            }
+
+            if (cancelled_Preparation)
+            {
+                MessageBox.Show("Cancelled while preparing the model. A partially written .tbd may remain in the output directory.");
+                return Result.Cancelled;
             }
 
             List<DesignDay> heatingDesignDays = new List<DesignDay>() { Analytical.Query.HeatingDesignDay(weatherData) };
@@ -229,7 +304,16 @@ namespace SAM.Analytical.Revit.UI
                 SimulateTo = 1
             };
 
-            analyticalModel = Analytical.UI.WPF.Modify.RunWorkflow(analyticalModel, workflowSettings);
+            // Was Analytical.UI.WPF.Modify.RunWorkflow, which runs the workflow with no progress dialog and no
+            // cancellation at all - a silent multi-minute freeze. This overload reports every stage and carries
+            // a Cancel button; see Modify.RunWorkflow for why it is not shared with the Grasshopper twin.
+            analyticalModel = Modify.RunWorkflow(analyticalModel, workflowSettings, System.Threading.CancellationToken.None, out bool cancelled_Workflow);
+
+            if (cancelled_Workflow)
+            {
+                MessageBox.Show("Workflow cancelled. Partially written .tbd/.tsd files may remain in the output directory.");
+                return Result.Cancelled;
+            }
 
             List<Core.ISAMObject> results = null;
 
@@ -248,8 +332,18 @@ namespace SAM.Analytical.Revit.UI
                 }
             }
 
+            // Set by the loops below when the user clicks Cancel, and read all the way out to the return: a
+            // cancelled insert rolls the Revit transaction back and skips everything that follows it.
+            bool cancelled_Insert = false;
+
             using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Inserting Results", results.Count + 5))
             {
+                // Unlike the preparation dialog above, this one does not need a host thread of its own: both loops
+                // below step once per result and Update pumps the message queue every step, so the form never
+                // goes long enough without pumping for Windows to ghost it and the click is always seen.
+                progressForm.Cancellable = true;
+                progressForm.Note = "Cancel stops after the current result - nothing is written into the model.";
+
                 progressForm.Update("Processing Revit");
                 if (adjacencyCluster != null && results != null && results.Count != 0)
                 {
@@ -267,6 +361,14 @@ namespace SAM.Analytical.Revit.UI
                         foreach (Space space in results.FindAll(x => x is Space))
                         {
                             progressForm.Update(string.IsNullOrWhiteSpace(space?.Name) ? "???" : space.Name);
+
+                            // Checked after Update, because Update is what pumps the queue and so what turns a
+                            // click made during the previous result into a set flag.
+                            if (progressForm.CancellationRequested)
+                            {
+                                cancelled_Insert = true;
+                                break;
+                            }
 
                             ElementId elementId = space.ElementId();
 
@@ -293,7 +395,19 @@ namespace SAM.Analytical.Revit.UI
 
                         foreach (Core.ISAMObject sAMObject in results.FindAll(x => !(x is Space)))
                         {
+                            // Carries a cancel out of the space loop above without re-indenting this one.
+                            if (cancelled_Insert)
+                            {
+                                break;
+                            }
+
                             progressForm.Update(sAMObject?.Name == null ? "???" : sAMObject.Name);
+
+                            if (progressForm.CancellationRequested)
+                            {
+                                cancelled_Insert = true;
+                                break;
+                            }
 
                             if (sAMObject is SpaceSimulationResult)
                             {
@@ -358,55 +472,62 @@ namespace SAM.Analytical.Revit.UI
                             }
                         }
 
-                        progressForm.Update("Coping Parameters");
+                        // Every SetValues above happened inside this transaction, so rolling back is what
+                        // makes the Note true: the model is left exactly as it was, however far the loops got.
+                        if (cancelled_Insert)
+                        {
+                            transaction.RollBack();
+                        }
+                        else
+                        {
+                            progressForm.Update("Coping Parameters");
 
-                        Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
+                            Revit.Modify.CopySpatialElementParameters(document, Tool.TAS);
 
-                        progressForm.Update("Finising Transaction");
+                            progressForm.Update("Finising Transaction");
 
-                        transaction.Commit();
+                            transaction.Commit();
+                        }
                     }
                 }
 
-                string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
-
-                progressForm.Update("Saving SAM Analytical Model");
-
-                Core.Convert.ToFile(analyticalModel, path_SAM);
-
-                progressForm.Update("Printing Room Data Sheets");
-                if (printRoomDataSheets && analyticalModel != null)
+                // Saving the JSON and printing the room data sheets are the remaining work of this command,
+                // so a cancel skips them too. The simulation itself already ran - its .tbd/.tsd are on disk
+                // either way - and the message at the end says so rather than claiming the run succeeded.
+                if (!cancelled_Insert)
                 {
-                    if (!System.IO.Directory.Exists(outputDirectory))
-                    {
-                        System.IO.Directory.CreateDirectory(outputDirectory);
-                    }
+                    string path_SAM = System.IO.Path.Combine(outputDirectory, projectName + ".json");
 
-                    Analytical.UI.Modify.PrintRoomDataSheets(analyticalModel, outputDirectory);
+                    progressForm.Update("Saving SAM Analytical Model");
+
+                    Core.Convert.ToFile(analyticalModel, path_SAM);
+
+                    progressForm.Update("Printing Room Data Sheets");
+                    if (printRoomDataSheets && analyticalModel != null)
+                    {
+                        if (!System.IO.Directory.Exists(outputDirectory))
+                        {
+                            System.IO.Directory.CreateDirectory(outputDirectory);
+                        }
+
+                        Analytical.UI.Modify.PrintRoomDataSheets(analyticalModel, outputDirectory);
+                    }
                 }
             }
 
             stopwatch.Stop();
 
-            string hoursString = stopwatch.Elapsed.Hours.ToString();
-            while (hoursString.Length < 2)
+            // Was hand-padded from Elapsed.Hours, which is the hours *component* of the TimeSpan and so wraps
+            // back to 00 after a day - a long enough run reported the wrong time. Query.Duration promotes past
+            // the hour properly and is the same formatter the progress dialog uses, so the two agree.
+            if (cancelled_Insert)
             {
-                hoursString = "0" + hoursString;
+                MessageBox.Show(string.Format("Results were not written into the model - cancelled.\nThe simulation itself finished and its output is in {0}.\nTime elapsed: {1}", outputDirectory, Core.Windows.Query.Duration(stopwatch.Elapsed)));
+
+                return Result.Cancelled;
             }
 
-            string minutesString = stopwatch.Elapsed.Minutes.ToString();
-            while (minutesString.Length < 2)
-            {
-                minutesString = "0" + minutesString;
-            }
-
-            string secondsString = stopwatch.Elapsed.Seconds.ToString();
-            while (secondsString.Length < 2)
-            {
-                secondsString = "0" + secondsString;
-            }
-
-            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}h {1}m {2}s", hoursString, minutesString, secondsString));
+            MessageBox.Show(string.Format("Simulation finished.\nTime elapsed: {0}", Core.Windows.Query.Duration(stopwatch.Elapsed)));
 
             return Result.Succeeded;
         }

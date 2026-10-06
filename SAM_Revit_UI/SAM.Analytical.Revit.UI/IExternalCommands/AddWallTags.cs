@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -72,39 +74,48 @@ namespace SAM.Analytical.Revit.UI
             }
 
             double minLength = 1.5;
-            using (Core.Windows.Forms.TextBoxForm<double> textBoxForm = new Core.Windows.Forms.TextBoxForm<double>("Wall Length", "Min Wall Length"))
-            {
-                textBoxForm.Value = minLength;
-                if (textBoxForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+            Core.UI.WPF.TextBoxWindow textBoxWindow = new Core.UI.WPF.TextBoxWindow("Wall Length", "Min Wall Length", minLength);
 
-                minLength = textBoxForm.Value;
+            // TextBoxWindow is not generic, so it carries no numeric key filter of its own. The WinForms
+            // TextBoxForm<double> got one from SetValue attaching EventHandler.ControlText_NumberOnly;
+            // this is that handler's own WPF overload, verbatim.
+            textBoxWindow.Validation = (string x) => !System.Text.RegularExpressions.Regex.IsMatch(x, "[^0-9.-]+");
+
+            new System.Windows.Interop.WindowInteropHelper(textBoxWindow).Owner = externalCommandData.Application.MainWindowHandle;
+
+            if (textBoxWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            // GetValue<double>() with no default returns 0 on an unparseable entry, which is what
+            // TextBoxForm<double>.Value did. Preserved deliberately rather than defaulting to minLength.
+            minLength = textBoxWindow.GetValue<double>();
 
             List<string> templateNames = new List<string> { "Heating Load" };
 
-            using (Core.Windows.Forms.TreeViewForm<View> treeViewForm = new Core.Windows.Forms.TreeViewForm<View>("Select Templates", views, (View view) => view.Name, null, (View view) => templateNames.Contains(view.Name)))
-            {
-                if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+            List<string> templateNames_Checked = templateNames;
 
-                templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
+            Core.UI.WPF.MultipleSelectionTreeViewWindow treeViewWindow = new Core.UI.WPF.MultipleSelectionTreeViewWindow { Title = "Select Templates" };
+            treeViewWindow.GettingText += (object sender, Core.UI.WPF.GettingTextEventArgs e) => e.Text = (e?.Object as View)?.Name;
+            treeViewWindow.GettingChecked += (object sender, Core.UI.WPF.GettingCheckedEventArgs e) => e.Checked = templateNames_Checked.Contains((e?.Object as View)?.Name);
+            treeViewWindow.SetObjects(views);
+
+            new System.Windows.Interop.WindowInteropHelper(treeViewWindow).Owner = externalCommandData.Application.MainWindowHandle;
+
+            if (treeViewWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            templateNames = treeViewWindow.GetObjects<View>()?.ConvertAll(x => x.Name);
 
             if (templateNames == null || templateNames.Count == 0)
             {
                 return Result.Failed;
             }
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020
-            minLength = UnitUtils.ConvertToInternalUnits(minLength, DisplayUnitType.DUT_METERS);
-#else
             minLength = UnitUtils.ConvertToInternalUnits(minLength, UnitTypeId.Meters);
-#endif
 
             for (int i = walls.Count - 1; i >= 0; i--)
             {

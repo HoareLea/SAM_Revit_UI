@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -55,20 +57,34 @@ namespace SAM.Analytical.Revit.UI
 
             List<Element> elements_Temp = new FilteredElementCollector(document).WherePasses(logicalOrFilter).WhereElementIsNotElementType().ToList();
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-            using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.IntegerValue), (Element x) => x.Category.Name, (Element x) =>x.Id.IntegerValue != 311))
-#else
-            using (Core.Windows.Forms.TreeViewForm<Element> treeViewForm = new Core.Windows.Forms.TreeViewForm<Element>("Select Elements", elements_Temp, (Element x) => string.Format("{0} [{1}]", x.Name, x.Id.Value), (Element x) => x.Category.Name, (Element x) => x.Id.Value != 311))
-#endif
+            // No CollapseAll equivalent is needed: a WPF TreeViewItem starts collapsed, which is what the
+            // WinForms tree had to be told to do.
+            Core.UI.WPF.MultipleSelectionTreeViewWindow treeViewWindow = new Core.UI.WPF.MultipleSelectionTreeViewWindow { Title = "Select Elements" };
+            treeViewWindow.GettingText += (object sender, Core.UI.WPF.GettingTextEventArgs e) =>
             {
-                treeViewForm.CollapseAll();
-                if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+                Element element = e?.Object as Element;
+                e.Text = element == null ? null : string.Format("{0} [{1}]", element.Name, element.Id.Value);
+            };
+            treeViewWindow.GettingCategory += (object sender, Core.UI.WPF.GettingCategoryEventArgs e) =>
+            {
+                string category = (e?.Object as Element)?.Category?.Name;
+                e.Category = string.IsNullOrEmpty(category) ? null : new Core.Category(category);
+            };
+            treeViewWindow.GettingChecked += (object sender, Core.UI.WPF.GettingCheckedEventArgs e) =>
+            {
+                Element element = e?.Object as Element;
+                e.Checked = element != null && element.Id.Value != 311;
+            };
+            treeViewWindow.SetObjects(elements_Temp);
 
-                elements_Temp = treeViewForm.SelectedItems;
+            new System.Windows.Interop.WindowInteropHelper(treeViewWindow).Owner = ExternalCommandData.Application.MainWindowHandle;
+
+            if (treeViewWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            elements_Temp = treeViewWindow.GetObjects<Element>();
             using (Transaction transaction = new Transaction(document, "Clean"))
             {
                 transaction.Start();

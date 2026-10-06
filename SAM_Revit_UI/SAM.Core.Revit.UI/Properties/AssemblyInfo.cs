@@ -3,6 +3,17 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+
+// GenerateAssemblyInfo is false (this file supplies attributes by hand), so
+// the SDK never emits its usual implicit
+// [assembly: SupportedOSPlatform("windows...")] for this -windows project
+// (net8.0-windows for Revit 2025/2026, net10.0-windows for Revit 2027).
+// Without it, the CA1416 platform-compatibility analyzer cannot tell this
+// assembly is Windows-only and flags every WinForms/WPF/Revit-UI API call
+// site as "reachable on all platforms" - the actual runtime constraint has
+// not changed, only the analyzer's visibility into it.
+[assembly: SupportedOSPlatform("windows")]
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information

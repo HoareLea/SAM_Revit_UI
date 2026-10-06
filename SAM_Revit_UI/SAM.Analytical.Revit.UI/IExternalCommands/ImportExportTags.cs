@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
@@ -86,7 +89,16 @@ namespace SAM.Analytical.Revit.UI
                 {
                     transaction.Start();
 
-                    Modify.ImportTags(document, tags);
+                    Modify.ImportTags(document, tags, out bool cancelled);
+
+                    // ImportTags places tags inside this transaction and cannot undo them itself, so rolling
+                    // back here is what makes its Cancel leave the document as it was.
+                    if (cancelled)
+                    {
+                        transaction.RollBack();
+
+                        return Result.Cancelled;
+                    }
 
                     transaction.Commit();
                 }

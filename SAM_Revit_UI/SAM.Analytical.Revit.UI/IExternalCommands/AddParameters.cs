@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Core.Revit.UI;
@@ -109,13 +111,8 @@ namespace SAM.Analytical.Revit.UI
                                 string parameterTypeString = objects[i, index_ParameterType] as string;
                                 parameterTypeString = parameterTypeString.Replace(" ", string.Empty);
 
-#if Revit2020 || Revit2021 || Revit2022
-                                ParameterType parameterType = ParameterType.Invalid;
-                                if (Enum.TryParse(parameterTypeString, out parameterType))
-#else
                                 ForgeTypeId forgeTypeId = Core.Revit.Query.ForgeTypeId(parameterTypeString);
                                 if (forgeTypeId != null)
-#endif
                                 {
                                     name = name.Trim();
 
@@ -127,11 +124,7 @@ namespace SAM.Analytical.Revit.UI
                                         if (definition == null)
                                         {
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022
-                                            ExternalDefinitionCreationOptions externalDefinitionCreationOptions = new ExternalDefinitionCreationOptions(name, parameterType);
-#else
                                             ExternalDefinitionCreationOptions externalDefinitionCreationOptions = new ExternalDefinitionCreationOptions(name, forgeTypeId);
-#endif
 
                                             string guid_String = objects[i, index_Guid] as string;
                                             if (!string.IsNullOrEmpty(guid_String))
@@ -156,44 +149,6 @@ namespace SAM.Analytical.Revit.UI
                                             {
                                                 string group = objects[i, 12] as string;
 
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-                                                BuiltInParameterGroup builtInParameterGroup;
-                                                if (Enum.TryParse("PG_" + group, out builtInParameterGroup))
-                                                {
-                                                    CategorySet categorySet = new CategorySet();
-
-                                                    string[] categoryNames = (objects[i, 13] as string).Split(',');
-                                                    foreach (string categoryName in categoryNames)
-                                                    {
-                                                        if (string.IsNullOrEmpty(categoryName))
-                                                            continue;
-
-                                                        BuiltInCategory builtInCategory;
-                                                        if (Enum.TryParse("OST_" + categoryName.Trim().Replace(" ", string.Empty), out builtInCategory))
-                                                        {
-                                                            Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.IntegerValue == (int)builtInCategory);
-                                                            if (category != null)
-                                                                categorySet.Insert(category);
-                                                        }
-                                                    }
-
-                                                    if (categorySet.Size > 0)
-                                                    {
-                                                        string instance = objects[i, 14] as string;
-
-                                                        if (string.IsNullOrEmpty(instance))
-                                                            continue;
-
-                                                        Autodesk.Revit.DB.Binding binding = null;
-                                                        if (instance != null && instance.Trim().ToUpper() == "INSTANCE")
-                                                            binding = ExternalCommandData.Application.Application.Create.NewInstanceBinding(categorySet);
-                                                        else
-                                                            binding = ExternalCommandData.Application.Application.Create.NewTypeBinding(categorySet);
-
-                                                        bindingMap.Insert(definition, binding, builtInParameterGroup);
-                                                    }
-                                                }
-#else
                                                 ForgeTypeId groupTypeId = Revit.Query.GroupTypeId(group);
                                                 if (groupTypeId != null)
                                                 {
@@ -208,11 +163,7 @@ namespace SAM.Analytical.Revit.UI
                                                         BuiltInCategory builtInCategory;
                                                         if (Enum.TryParse("OST_" + categoryName.Trim().Replace(" ", string.Empty), out builtInCategory))
                                                         {
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-                                                            Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.IntegerValue == (int)builtInCategory);
-#else
                                                             Category category = document.Settings.Categories.Cast<Category>().ToList().Find(x => x.Id.Value == (long)builtInCategory);
-#endif
 
                                                             if (category != null)
                                                                 categorySet.Insert(category);
@@ -235,7 +186,6 @@ namespace SAM.Analytical.Revit.UI
                                                         bindingMap.Insert(definition, binding, groupTypeId);
                                                     }
                                                 }
-#endif
                                             }
                                         }
                                     }

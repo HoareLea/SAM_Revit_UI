@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.UI;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+
+using Autodesk.Revit.UI;
 using System.Reflection;
 
 namespace SAM.Revit.UI.Classes
@@ -29,14 +32,19 @@ namespace SAM.Revit.UI.Classes
             assemblyResolver.Enable(
               managedDirectories:
               [
-                directory_SAM,
                 directory_Revit,
+                // Revit ships a version-specific native dependency set. Resolve its
+                // managed entry points from the same directory before the shared SAM
+                // folder so an interop assembly cannot bind to a different native ABI.
+                directory_SAM,
                 //Path.Combine(directory, "lib")
               ],
               nativeDirectories:
               [
-                Path.Combine(directory_SAM, "runtimes", "win-x64", "native"),
+                directory_Revit,
                 Path.Combine(directory_Revit, "runtimes", "win-x64", "native"),
+                directory_SAM,
+                Path.Combine(directory_SAM, "runtimes", "win-x64", "native"),
               ]
             );
 

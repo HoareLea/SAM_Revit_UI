@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -71,15 +73,21 @@ namespace SAM.Analytical.Revit.UI
 
             List<string> templateNames = new List<string> { "Heating Load" };
 
-            using (Core.Windows.Forms.TreeViewForm<View> treeViewForm = new Core.Windows.Forms.TreeViewForm<View>("Select Templates", views, (View view) => view.Name, null, (View view) => templateNames.Contains(view.Name)))
-            {
-                if (treeViewForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+            List<string> templateNames_Checked = templateNames;
 
-                templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
+            Core.UI.WPF.MultipleSelectionTreeViewWindow treeViewWindow = new Core.UI.WPF.MultipleSelectionTreeViewWindow { Title = "Select Templates" };
+            treeViewWindow.GettingText += (object sender, Core.UI.WPF.GettingTextEventArgs e) => e.Text = (e?.Object as View)?.Name;
+            treeViewWindow.GettingChecked += (object sender, Core.UI.WPF.GettingCheckedEventArgs e) => e.Checked = templateNames_Checked.Contains((e?.Object as View)?.Name);
+            treeViewWindow.SetObjects(views);
+
+            new System.Windows.Interop.WindowInteropHelper(treeViewWindow).Owner = externalCommandData.Application.MainWindowHandle;
+
+            if (treeViewWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            templateNames = treeViewWindow.GetObjects<View>()?.ConvertAll(x => x.Name);
 
             if (templateNames == null || templateNames.Count == 0)
             {
@@ -87,13 +95,8 @@ namespace SAM.Analytical.Revit.UI
             }
 
             List<Tuple<ElementId, List<FamilyInstance>>> tuples = new List<Tuple<ElementId, List<FamilyInstance>>>();
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-            tuples.Add(new Tuple<ElementId, List<FamilyInstance>>(elementTypes_WindowTags.Find(x => x.Id.IntegerValue == 775113)?.Id, familyInstances_Window));
-            tuples.Add(new Tuple<ElementId, List<FamilyInstance>>(elementTypes_DoorTags.Find(x => x.Id.IntegerValue == 775351)?.Id, familyInstances_Door));
-#else
             tuples.Add(new Tuple<ElementId, List<FamilyInstance>>(elementTypes_WindowTags.Find(x => x.Id.Value == 775113)?.Id, familyInstances_Window));
             tuples.Add(new Tuple<ElementId, List<FamilyInstance>>(elementTypes_DoorTags.Find(x => x.Id.Value == 775351)?.Id, familyInstances_Door));
-#endif
 
             using (Transaction transaction = new Transaction(document, "Add Window and Door Tags"))
             {

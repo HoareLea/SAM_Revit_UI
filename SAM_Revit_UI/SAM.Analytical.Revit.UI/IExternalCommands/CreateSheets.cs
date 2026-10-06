@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -37,19 +39,16 @@ namespace SAM.Analytical.Revit.UI
             List<ViewSheet> viewSheets = new FilteredElementCollector(document).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList();
 
             ViewSheet viewSheet = null;
-#if Revit2017 || Revit2018 || Revit2019 || Revit2020 || Revit2021 || Revit2022 || Revit2023 || Revit2024
-            using (Core.Windows.Forms.ComboBoxForm<ViewSheet> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewSheet>("Reference View Sheet", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), viewSheets.Find(x => x.Id.IntegerValue == 725533)) )
-#else
-            using (Core.Windows.Forms.ComboBoxForm<ViewSheet> comboBoxForm = new Core.Windows.Forms.ComboBoxForm<ViewSheet>("Reference View Sheet", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), viewSheets.Find(x => x.Id.Value == 725533)))
-#endif
-            {
-                if (comboBoxForm.ShowDialog() != DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
+            Core.UI.WPF.ComboBoxWindow<ViewSheet> comboBoxWindow = new Core.UI.WPF.ComboBoxWindow<ViewSheet>("Reference View Sheet", viewSheets, (ViewSheet x) => string.Format("{0} - {1}", x.SheetNumber, x.Name), viewSheets.Find(x => x.Id.Value == 725533));
 
-                viewSheet = comboBoxForm.SelectedItem;
+            new System.Windows.Interop.WindowInteropHelper(comboBoxWindow).Owner = commandData.Application.MainWindowHandle;
+
+            if (comboBoxWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            viewSheet = comboBoxWindow.SelectedItem;
 
             if (viewSheet == null)
             {
@@ -65,15 +64,24 @@ namespace SAM.Analytical.Revit.UI
             }
 
             List<string> templateNames = null;
-            using (Core.Windows.Forms.TreeViewForm<ViewPlan> treeViewForm = new Core.Windows.Forms.TreeViewForm<ViewPlan>("Select Templates", viewPlans, (ViewPlan x) => x.Name, null, (ViewPlan x) => x.Name == "Cooling Load" || x.Name == "Heating Load"))
-            {
-                if (treeViewForm.ShowDialog() != DialogResult.OK)
-                {
-                    return Result.Cancelled;
-                }
 
-                templateNames = treeViewForm.SelectedItems?.ConvertAll(x => x.Name);
+            Core.UI.WPF.MultipleSelectionTreeViewWindow treeViewWindow = new Core.UI.WPF.MultipleSelectionTreeViewWindow { Title = "Select Templates" };
+            treeViewWindow.GettingText += (object sender, Core.UI.WPF.GettingTextEventArgs e) => e.Text = (e?.Object as ViewPlan)?.Name;
+            treeViewWindow.GettingChecked += (object sender, Core.UI.WPF.GettingCheckedEventArgs e) =>
+            {
+                string name = (e?.Object as ViewPlan)?.Name;
+                e.Checked = name == "Cooling Load" || name == "Heating Load";
+            };
+            treeViewWindow.SetObjects(viewPlans);
+
+            new System.Windows.Interop.WindowInteropHelper(treeViewWindow).Owner = commandData.Application.MainWindowHandle;
+
+            if (treeViewWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
             }
+
+            templateNames = treeViewWindow.GetObjects<ViewPlan>()?.ConvertAll(x => x.Name);
 
             using (Transaction transaction = new Transaction(document, "Create Sheets"))
             {

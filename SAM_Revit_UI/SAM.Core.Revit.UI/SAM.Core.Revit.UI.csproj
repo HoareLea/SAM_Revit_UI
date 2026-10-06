@@ -11,13 +11,9 @@
 	</PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework Condition="'$(RevitYear)' == '2020'">net48-windows</TargetFramework>
-        <TargetFramework Condition="'$(RevitYear)' == '2021'">net48-windows</TargetFramework>
-        <TargetFramework Condition="'$(RevitYear)' == '2022'">net48-windows</TargetFramework>
-        <TargetFramework Condition="'$(RevitYear)' == '2023'">net48-windows</TargetFramework>	  
-        <TargetFramework Condition="'$(RevitYear)' == '2024'">net48-windows</TargetFramework>
         <TargetFramework Condition="'$(RevitYear)' == '2025'">net8.0-windows</TargetFramework>
         <TargetFramework Condition="'$(RevitYear)' == '2026'">net8.0-windows</TargetFramework>
+        <TargetFramework Condition="'$(RevitYear)' == '2027'">net10.0-windows</TargetFramework>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <OutputType>Library</OutputType>
@@ -25,7 +21,7 @@
         <UseWindowsForms>true</UseWindowsForms>
         <UseWPF>true</UseWPF>
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-        <Configurations>Debug;Release;Debug2021;Debug2020;Debug2022;Debug2023;Debug2024;Release2020;Release2021;Release2022;Release2023;Release2024;Debug2025;Release2025;Debug2026;Release2026</Configurations>
+        <Configurations>Debug;Release;Debug2025;Release2025;Debug2026;Release2026;Debug2027;Release2027</Configurations>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<OutputPath>..\..\build\</OutputPath>
     </PropertyGroup>
@@ -66,26 +62,6 @@
 
   <PropertyGroup>
     <PostBuildEvent>
-      if "$(Configuration)" == "Debug2020" (
-      set Version=Revit 2020
-      )
-
-      if "$(Configuration)" == "Debug2021" (
-      set Version=Revit 2021
-      )
-
-      if "$(Configuration)" == "Debug2022" (
-      set Version=Revit 2022
-      )
-
-      if "$(Configuration)" == "Debug2023" (
-      set Version=Revit 2023
-      )
-
-      if "$(Configuration)" == "Debug2024" (
-      set Version=Revit 2024
-      )
-
       if "$(Configuration)" == "Debug2025" (
       set Version=Revit 2025
       )
@@ -94,24 +70,8 @@
       set Version=Revit 2026
       )
 
-      if "$(Configuration)" == "Release2020" (
-      set Version=Revit 2020
-      )
-
-      if "$(Configuration)" == "Release2021" (
-      set Version=Revit 2021
-      )
-
-      if "$(Configuration)" == "Release2022" (
-      set Version=Revit 2022
-      )
-
-      if "$(Configuration)" == "Release2023" (
-      set Version=Revit 2023
-      )
-
-      if "$(Configuration)" == "Release2024" (
-      set Version=Revit 2024
+      if "$(Configuration)" == "Debug2027" (
+      set Version=Revit 2027
       )
 
       if "$(Configuration)" == "Release2025" (
@@ -122,11 +82,21 @@
       set Version=Revit 2026
       )
 
+      if "$(Configuration)" == "Release2027" (
+      set Version=Revit 2027
+      )
+
+      ::A Revit-year configuration with no matching branch above would leave Version empty,
+      ::collapsing SAM_DIR to %25APPDATA%25\SAM itself and scattering that year's assemblies
+      ::loose into the shared Rhino/Grasshopper folder. Fail loudly instead - silently
+      ::deploying net10 (2027) assemblies next to net8 ones is far worse than a build error.
+      if "%25Version%25" == "" (
+      echo POST-BUILD ERROR: no SAM_DIR mapping for configuration '$(Configuration)'. Add a 'set Version=Revit ^&lt;year^&gt;' branch above.
+      exit /b 1
+      )
+
       set SAM_DIR=$(APPDATA)\SAM\%25Version%25
       if not exist "%25SAM_DIR%25" mkdir "%25SAM_DIR%25"
-
-      ::Copy /Y "$(SolutionDir)references\TopologicCore.dll" "$(TargetDir)TopologicCore.dll"
-      ::Copy /Y "$(SolutionDir)references\TK*.dll" "$(TargetDir)TK*.dll"
 
       copy "$(TargetDir)*.dll" "%25SAM_DIR%25"
       ::copy "$(TargetDir)*.exe" "%25SAM_DIR%25"

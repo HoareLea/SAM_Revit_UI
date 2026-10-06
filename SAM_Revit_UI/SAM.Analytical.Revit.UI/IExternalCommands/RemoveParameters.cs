@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.Attributes;
+﻿// SPDX-License-Identifier: LGPL-3.0-or-later
+// Copyright (c) 2020-2026 Michal Dengusiak & Jakub Ziolkowski and contributors
+
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using SAM.Analytical.Revit.UI.Properties;
@@ -84,8 +87,14 @@ namespace SAM.Analytical.Revit.UI
                 }
 
                 List<string> names = new List<string>();
-                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Creating Shared Parameters", objects.GetLength(0)))
+                bool cancelled = false;
+                using (Core.Windows.Forms.ProgressForm progressForm = new Core.Windows.Forms.ProgressForm("Removing Shared Parameters", objects.GetLength(0)))
                 {
+                    // One step per row and Update pumps the message queue every step, so the form never stops
+                    // responding and the click is seen - no host thread of its own needed here.
+                    progressForm.Cancellable = true;
+                    progressForm.Note = "Cancel stops after the current parameter - nothing is removed.";
+
                     for (int i = 5; i <= objects.GetLength(0); i++)
                     {
                         string name = objects[i, index_Name] as string;
@@ -103,7 +112,24 @@ namespace SAM.Analytical.Revit.UI
                         }
 
                         progressForm.Update(name);
+
+                        // Checked after Update, because Update is what pumps the queue and so what turns a
+                        // click made during the previous row into a set flag.
+                        if (progressForm.CancellationRequested)
+                        {
+                            cancelled = true;
+                            break;
+                        }
                     }
+                }
+
+                // Every removal so far happened inside this transaction, so rolling back is what makes the
+                // Note above true: the document is left exactly as it was, however far the loop got.
+                if (cancelled)
+                {
+                    transaction.RollBack();
+
+                    return Result.Cancelled;
                 }
 
                 transaction.Commit();
